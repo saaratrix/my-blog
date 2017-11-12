@@ -1,0 +1,259 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    This is about writing a .net core application to automatically convert glsl into babylon shaderstore code.
+    The project is available on github <a href="https://github.com/haestflod/glsl-babylonshader">here</a>.
+    <!--more-->
+    <br />
+    <br />
+    <div id="toc"></div>
+    <div id="contents">
+        <h1>Introduction and features</h1>
+        I had to write a custom shader for a post processing component for a BabylonJS project and I found the process of writing BabylonJS ShadersStore code time consuming.
+        ShadersStore is a string value with each line added as a separate value for readability.
+<pre class="prettyprint lang-js linenums">
+<code>
+BABYLON.Effect.ShadersStore["LinesPixelShader"] =
+"#ifdef GL_ES\n" +
+"   precision highp float;\n" +
+"#endif\n\n" +
+"varying vec2 vUV; \n" +
+"void main(void) {\n" +
+"   gl_FragColor = vec4(vUV.x,vUV.y,-vUV.x, 1.0);\n" +
+"}\n" +
+"";
+</code>
+</pre>
+        Snippet is from <a href="https://doc.babylonjs.com/tutorials/How_to_use_Procedural_Textures">here</a>
+        <br />
+        <br />
+        So what I wanted to do was work directly in <b>.fx</b> files and then convert that into ShadersStore code.
+        If you don't want to use shadersstore format you can import the shadercode as a &lt;script&gt; element or load an .fx file programmatically in Babylon.
+        However for post-processing we only used a fragment shader and it was easiest to add it as a ShadersStore asset which is why we used the ShadersStore format.
+        <br />
+        <br />
+        I had been wanting to test .net core console development for a while and decided to automate glsl code written in a .fx file into shadersstore code.
+        This kind of program probably is better suited as a gulp/grunt task.
+
+        <h1>What is BabylonJS?</h1>
+        <a href="http://babylonjs.com/">BabylonJS</a> is an open source framework for building 3D games with html5.
+        It really simplifies the usage of WebGL.
+        <br />        
+        <br />
+        It is written in Typescript which I think gives it an edge over for example <a href="https://threejs.org/">ThreeJS</a>.
+        <br />
+        <br />
+        I have been using BabylonJS for about 7 months (Jan 2017) and the community is great.
+        If you have a question you can ask it on their <a href="http://www.html5gamedevs.com/forum/16-babylonjs/">forum</a>.
+        They are very good at answering and active and if the feature is missing in BabylonJS they might even develop it for you!
+        <br />
+        <br />
+        The only bad thing I can think of BabylonJS is that I've had to look at the source code sometimes to understand some things
+        but it's a massive project so hard to have documentation for everything.
+        But looking at the source code has also in some cases allowed for a deeper understanding of how the Babylon framework works.
+
+        <h1>The glsl-babylonshader project</h1>
+        This project converts <b>*.fx</b> into <b>*.fx.output</b> with the correct shadersstore code.
+
+        <h2>Evolution of the application</h2>
+        When I started this project my goal was to just simply convert the glsl shader code into the shadersstore format.
+        But I realized that having to use the app everytime I did file save was a bit tedious so I looked into using <b>System.IO.FileSystemWatcher</b>.
+        What that did was everytime I updated the .fx file I now just had to copypaste it into the correct js file. Instead of also first doing the conversion.
+
+        Then eventually I decided to try and go one step further and have the correct js file also update which meant I only had to edit the .fx file.
+        So now once you update the .fx file it will also update the .ouput file and the .js files that uses the ShadersStore with that name.
+        <b>test.vertex.fx</b> will update all the js files with:
+<pre class="prettyprint lang-cpp">
+<code>
+    ShadersStore["TestVertexShader"]
+</code>
+</pre>
+
+        <h2>Example of output</h2>
+        For example the file <b>test.vertex.fx</b> with file content:
+<pre class="prettyprint lang-cpp linenums">
+<code>
+attribute vec3 aPosition;
+uniform mat4 projModelViewMatrix;
+varying vec3 vPosition;
+void main(void)
+{
+    vPosition = projModelViewMatrix * vec4(aPosition, 1.0);
+    gl_Position = vPosition;
+}
+</code>
+</pre>
+        Will generate this output in <b>test.vertex.fx.output</b>
+<pre class="prettyprint lang-js linenums">
+<code>
+BABYLON.Effect.ShadersStore["TestVertexShader"]=
+"attribute vec3 aPosition;"+
+"uniform mat4 projModelViewMatrix;"+
+"varying vec3 vPosition;"+
+"void main(void)"+
+"{"+
+"vPosition = projModelViewMatrix * vec4(aPosition, 1.0);"+
+"gl_Position = vPosition;"+
+"}";
+</code>
+</pre>
+
+        <h1>Working with .net core</h1>
+        Working with .net core is very similar to how the current .net console app development works.
+        There have been minor which I assume comes from it being cross-platform now.
+        I've mainly only worked with System.IO for this application and how you read a file with StreamReader is now different.
+        One example of a change is the removal of <b>Environment.CurrentDirectory</b> which you instead get by <b>System.IO.Directory.GetCurrentDirectory();</b>
+
+        <h2>System.IO</h2>
+        The nature of this project made it use System.IO a lot for I/O operations to manipulate files.
+        <h3>FileReading</h3>
+        The old way of reading a file for example was:
+<pre class="prettyprint lang-cs linenums">
+<code>
+using (StreamReader sr = new StreamReader("file.txt"))
+{
+    // Use the sr object
+}
+</code>
+</pre>
+        But now StreamReader no longer takes a string as input instead it only takes a stream. Same with BinaryReader.
+        So for reading a file it looks like this now:
+<pre class="prettyprint lang-cs linenums">
+<code>
+using (FileStream fs = new FileStream("file.txt", FileMode.Open))
+{
+    using (StreamReader sr = new StreamReader(fs, Encoding.UTF8))
+    {
+        // Use the sr object
+    }
+}
+</code>
+</pre>
+        You can still use <code>File.ReadAllText("file.text")</code> if you need all the text from a file for example.
+        <h3>FileSystemWatcher</h3>
+        I had never used FileSystemWatcher so it was new to me. To get it to work I had to add it to my project.json file.
+<pre class="prettyprint lang-js">
+<code>
+    "System.IO.FileSystem.Watcher": "4.3.0"
+</code>
+</pre>
+        Getting the settings correctly I remember took some testing and this is how I setup the FileSystemWatcher to work for these scenarios:
+        <ul>
+            <li>Creating File</li>
+            <li>Changing FileContents</li>
+            <li>Renaming File</li>
+            <li>Removing File</li>
+        </ul>
+<pre class="prettyprint lang-cs linenums">
+<code>
+    FileSystemWatcher watcher;
+    public Watcher() 
+    {
+        // In the constructor
+        watcher = new FileSystemWatcher();
+        watcher.Path = "someFolderToWatch;
+        // Only watch .fx files
+        watcher.Filter = "*.fx";
+        // Did not use CreationTime, Security, Size
+        watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess
+            | NotifyFilters.FileName | NotifyFilters.DirectoryName
+            | NotifyFilters.Attributes;
+        watcher.EnableRaisingEvents = true;
+                    
+        watcher.Changed += new FileSystemEventHandler(OnChanged);
+                    
+        // If the file is deleted or renamed then delete the old output
+        watcher.Deleted += new FileSystemEventHandler(OnRemoved);
+        watcher.Renamed += new RenamedEventHandler(OnRenamed);
+    }
+    // ------------------------
+    // The event functions 
+    
+    // When a file's content changed    
+    private void OnChanged(object source, FileSystemEventArgs e)
+    {            
+        m_converter.ConvertFile(e.FullPath);
+    }
+    // This happens 2 times everytime you save the a file, why I'm not sure
+    private void OnRemoved(object source, FileSystemEventArgs e)
+    {          
+        if (!File.Exists(e.FullPath))
+        {
+            string outputPath = e.FullPath + ".output";
+            // Get output file
+            if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
+        }                        
+    }
+    private void OnRenamed(object source, RenamedEventArgs e)
+    {   
+        // I'm sorry but I don't remember why it could end with ~
+        if (!e.OldName.EndsWith("~"))
+        {
+            string oldOutput = e.OldFullPath + ".output";
+            if (File.Exists(oldOutput))
+            {
+                File.Delete(oldOutput);
+            }              
+        }            
+    }
+</code>
+</pre>
+
+        <h2>Unit tests</h2>
+        When I first started building a .net core application before this one when .net core was recently announced the tooling for Visual Studio hadn't been released yet properly.
+        So I tried to set up something called <a href="http://xunit.github.io/docs/getting-started-dotnet-core">xunit</a> without proper success.
+
+        Luckily when I decided to make this application the tooling had caught up and I could use visual studio to set everything up for me.
+        And Microsoft had ported MS Unit Tests to .net core by then so I could use that instead of a 3rd party.
+
+        I like using Moq for unit tests but that wasn't at the time ported to .net core so I had to go the old fashioned way and create a <a href="https://github.com/haestflod/glsl-babylonshader/blob/master/src/tests/testhelpers/Interfaces/MockConverter.cs">MockInterface</a> myself to properly unit test.
+        Moq might be ported to .net core now based off this post:
+        <a href="http://stackoverflow.com/questions/40127329/how-to-add-moq-as-a-dependency-in-dotnet-core">http://stackoverflow.com/questions/40127329/how-to-add-moq-as-a-dependency-in-dotnet-core</a>
+
+        <h2>Building the app</h2>
+        Building the application used to be very different than it is today.
+        Before all you got when building was a dll file and you had to use command prompt for example:
+        <code>dotnet glsl-babylon.dll</code>
+
+        <br />
+        <br />
+        Now when you build the application in <b><a href="https://github.com/haestflod/glsl-babylonshader/blob/master/src/glsl-babylon/project.json">project.json</a></b>
+        the runtimes property will create an .exe file on windows and on linux &amp; osx it will generate similar binaries.
+
+        <h1>Improvements to the application</h1>
+        Currently it only handles Fragment and not also Pixel as the ShadersStore key. Which it can also be called.
+<pre class="prettyprint lang-js linenums">
+<code>
+    // Fragment
+    BABYLON.Effect.ShadersStore["TestFragmentShader"];
+    // Pixel
+    BABYLON.Effect.ShadersStore["TestPixelShader"];
+</code>
+</pre>
+        <br />
+        <br />
+        This application can also quite easily be tweaked to instead of outputting the format for BabylonJS it can instead do it for Three.js as it uses similar syntax.
+        <br />
+        <br />
+        There are some misc things like improved user friendlyless and a help command to show all the inputs.
+        The js file finder could be improved in how it finds files as it only searches folders where the convert command was.
+        Meaning if you have 2 folders <b>shaders</b>, <b>js</b> and you tell converter to convert files in shaders it won't find js.
+
+        <h1>Conclusion</h1>
+        Building a .net core application has been an experience in in how .net core evolved over time.
+        It's been interesting to see how Microsoft changed .net tooling over the year (2016) and they made big improvements.
+        Since it's C# and it's .net it's very similar to how you write a current console application.
+        As someone that loves C# as a language if I ever have to write a cross platform application .net core is great!
+
+        <br />
+        <br />
+        About the app itself I'm satisfied with the result and now hopefully if I need to change some ShadersStore code in the future all I have to do is edit 1 file!
+    </div>
+</body>
+</html>

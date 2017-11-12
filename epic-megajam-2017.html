@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <p>
+        Me and Ronja (<a href="https://twitter.com/Roniatrix">@Roniatrix</a>) made a game together for the <a href="https://forums.unrealengine.com/unreal-engine/events/1363542-announcing-the-2017-epic-megajam">Epic MegaJam 2017</a>.
+        The theme for this gamejam was: <strong>However vast the darkness, we must supply our own light</strong>.
+        Our game is called <strong>E For Hugs</strong>.
+        This post is about our way from start to finish making the game.
+        Gameplay of the game can be found here: <a href="https://youtu.be/A-0y85LOBo4">https://youtu.be/A-0y85LOBo4</a>
+        The game was implemented using only blueprints for the code.
+        <br />
+        The game can be downloaded here: <a href="https://www.dropbox.com/s/ypmgekycdpldaht/EForHugs.zip?dl=0">https://www.dropbox.com/s/ypmgekycdpldaht/EForHugs.zip?dl=0</a>
+    </p>
+    <br />
+    <br />
+    <!--more-->   
+    <h2>November 2nd (Thursday)</h2>
+    <p>
+        The gamejam started on 2nd of November and we brainstormed for a bit for what game we should make.
+        At the end we still didn't know what game we wanted to make and called it quits for the day.
+    </p>    
+    <h2>November 3rd (Friday)</h2>
+    <p>
+        Being rejuvenated on friday morning we brainstormed for about an hour more where the best ideas was either a misty forest with tentacles or mining coal to keep the city running.
+        And then it just clicked that we should make a game about hugging!
+        The initial idea was that the world is very dark and that you hug someone and that will make them glow brighter.
+        Which would then brighten the whole world aswell.
+        <br />
+        <br />
+        We weren't sure what style to go with but Ronja decided initially to make it 3D sidescroller because it might be simpler to do the models. 
+    </p>
+    
+    <h2>November 4th (Saturday)</h2>
+    <p>
+        It's weekend and no more work so time to get into this more seriously!
+        Continuing with the 3D sidescroller prototype from yesterday I experimented with lighting and other things that we might need as how the final game would look like wasn't more than just a concept.
+        <br />
+        <a href="https://1.bp.blogspot.com/-93DCxBPJukg/WgbZPI3FqMI/AAAAAAAAAAY/NxesiXxmgpQGJSw9zp4Lx93iNv8vTa43QCLcBGAs/s1600/earlyprototype.png" imageanchor="1"><img border="0" src="https://1.bp.blogspot.com/-93DCxBPJukg/WgbZPI3FqMI/AAAAAAAAAAY/NxesiXxmgpQGJSw9zp4Lx93iNv8vTa43QCLcBGAs/s320/earlyprototype.png" width="320" height="126" data-original-width="1183" data-original-height="466" /></a> 
+        <br />
+        We knew we wanted it to rain and the more people you hug the less it rains.
+        So I looked at some rain tutorials and followed this one to make it rain. 
+        The rain tutorial: <a href="https://youtu.be/Qmb2FrFunME">https://youtu.be/Qmb2FrFunME</a>
+        <br />
+        I havn't used particle effects much before and since it was GPU particles it didn't work that well unless the camera was looking at the particles.
+        Which was solved by setting a checkbox <strong>Use fixed relative bounding box</strong> to true in the particle system.             
+    </p>
+    <p>
+        That was about that for saturday, also Ronja was inspired by work in progress pictures by team <strong>Analogue Circle</strong> for their game <a href="https://jonathansty.itch.io/meronikto">Meronikto</a>.
+        So she started creating assets in similar style. 
+    </p>
+    <h2>November 5th (Sunday)</h2>
+    <p>
+        The work continued where I focused on the hugging mechanic where you'd hold down E or F or left mouse button to hug.
+        I also made the huggable actors rotate to face the player although there's no smooth facing so if you try to sneak up on one like a ninja they'll instantly turn to face you!
+        Also at this time we were still using 3D sidescroller but at the end of the day we had plans of using open world 3D instead. 
+        The huggable actors at this point was off to the side so they didn't block your path since it was a side scroller.
+        <br />
+        <a href="https://4.bp.blogspot.com/-0mRfaGrhTAY/WgbZlJ3ICjI/AAAAAAAAAAc/YCBDRaa-fswZCgYRNlMXonzNPwH7xyw3gCLcBGAs/s1600/earlyprototype_rain.png" imageanchor="1"><img border="0" src="https://4.bp.blogspot.com/-0mRfaGrhTAY/WgbZlJ3ICjI/AAAAAAAAAAc/YCBDRaa-fswZCgYRNlMXonzNPwH7xyw3gCLcBGAs/s320/earlyprototype_rain.png" width="320" height="127" data-original-width="1178" data-original-height="468" /></a>
+    </p>
+    <p>
+        I spent quite bit of development on the Move To code when hugging because the animation needed the characters to be really close or they'd be hugging empty air.
+        Initially the code was using Simple Move To Location but it didn't work without artifacts. 
+        It was hard to get them really close. 
+        So I tried to just set the velocity in the direction of the huggable actor but if you got too large velocity you'd overshoot the meet point and then have to run backwards.
+        So I'll need to study the character movement component more!
+        The code was ultimately changed to use Simple Move To Actor instead of Location because it seemed better however in some cases it makes the player run to the other side which can look funny.  
+        Which is demonstrated in <a href="https://twitter.com/Roniatrix/status/928713474267545600">this clip.</a>
+    </p>
+    <p>        
+        Ronja did some testing with foliage and the house models.  
+        <br />
+        <a href="https://2.bp.blogspot.com/-Tjt9nAV-DNM/WgbZ0l-4YuI/AAAAAAAAAAk/XfndiCS2NHcx8TV4-FejmQvPG-aRY2GSgCLcBGAs/s1600/earlyprototype_stresstest.png" imageanchor="1"><img border="0" src="https://2.bp.blogspot.com/-Tjt9nAV-DNM/WgbZ0l-4YuI/AAAAAAAAAAk/XfndiCS2NHcx8TV4-FejmQvPG-aRY2GSgCLcBGAs/s320/earlyprototype_stresstest.png" width="320" height="143" data-original-width="1063" data-original-height="475" /></a>
+    </p>
+    <h2>November 6th (Monday)</h2>
+    <p>
+        The hugging mechanic was fine tuned and more tests were done with the lighting mechanic. 
+        However we were not too happy with the way the lighting worked and we thought it'd be cooler if it'd start greyscale (desaturated) and then turn into colour (saturated) instead.
+        So I spent the rest of the day experimenting techniques having it smoothly transition from desaturation to saturation.
+        First I tried using post processing but that quickly became an issue because we could not have areas being varied degree of saturated. 
+        So then I tried using custom depth for post processing but I could not make it work where a mesh was only partly saturated like the ground mesh.    
+        That was the end of monday.
+    </p>
+    <p>
+        Ronja worked on the artstyle and the assets of the game. This image shows roughly what assets we had at the end of monday.
+        <br />
+        <a href="https://4.bp.blogspot.com/-Y3slszYoWag/WgbaRno6FsI/AAAAAAAAAAs/9-6m6Tj2pX8_Umjm1oFid7Ehj6LKgtWewCLcBGAs/s1600/assets.png" imageanchor="1"><img border="0" src="https://4.bp.blogspot.com/-Y3slszYoWag/WgbaRno6FsI/AAAAAAAAAAs/9-6m6Tj2pX8_Umjm1oFid7Ehj6LKgtWewCLcBGAs/s320/assets.png" width="320" height="180" data-original-width="1600" data-original-height="900" /></a>
+    </p>
+    <h2>November 7th (Tuesday)</h2>
+    <p>
+        Found a tutorial by Alan Willard at Epic which showcases the effect we're using at ~5minutes 55 seconds but for opacity instead.
+        <a href="https://www.youtube.com/watch?v=CkEueafOvFg#t=5m55s">Link to tutorial.</a>
+        <br />
+        <br />
+        Which essentially is just a point in 3D and then using a sphere mask to find out if the material is affected or not.
+        Here's an early prototype of the feature used by 2 huggable actors. 
+        <br />
+        <a href="https://4.bp.blogspot.com/-gi1c2iB_WkY/Wgbavt-5U8I/AAAAAAAAAA0/RCuY7PDj0cgLjqfH943vfxFk4YwaeEAKQCLcBGAs/s1600/earlyprototype_locationbasedsaturation.png" imageanchor="1"><img border="0" src="https://4.bp.blogspot.com/-gi1c2iB_WkY/Wgbavt-5U8I/AAAAAAAAAA0/RCuY7PDj0cgLjqfH943vfxFk4YwaeEAKQCLcBGAs/s320/earlyprototype_locationbasedsaturation.png" width="320" height="128" data-original-width="1171" data-original-height="468" /></a>
+    </p>
+    <p>
+        It took a while to figure out how the location based saturation should work on a dynamic amount of points (amount of huggable actors) with minimal changes.
+        Which was solved using a material expression custom node iterating over the Material Parameter Collection array.
+        Here's the custom hlsl code used:
+        <pre class="prettyprint linenums lang-c">
+            <code>
+float saturation = 0;
+
+int totalCharacters = (int)MaterialCollection0.Vectors[0].x;
+
+for (int i = 0; i < totalCharacters; i++)
+{        
+    // Because Vectors[0] is taken by the scalar values we start on [1] (0+1)
+    // xyz = worldspace position
+	// w = radius
+    float4 location = MaterialCollection0.Vectors[i+1];
+
+	// Sphere Mask by copying hlsl code from generated hlsl code from material editor		
+    float3 distance = (worldPosition - location.xyz); // A - B 		
+    float distanceDot = dot(distance, distance); 
+    float squaredDistanceDot = sqrt(distanceDot);
+    float Local4 = (squaredDistanceDot * location.w); 
+    float Local5 = (1.00000000 - Local4);
+    float Local6 = (Local5 * 6.66666508); // 1.0f / FMath::Max(1.0f - HardnessPercent * 0.01f, 0.00001f);  HardnessPercent = 85
+    float sphereMaskValue = min(max(Local6, 0.00000000), 1.00000000); // clamp
+
+    saturation = max(saturation, sphereMaskValue);
+}
+
+// This returns the sphere mask value, if 1 it should be fully coloured
+// If 0 meaning sphereMask never intersected it will be greyscale
+return saturation;
+            </code>
+        </pre>
+    </p>
+    <p>
+        We also tested with the foliage which looked like this: 
+        <br />
+        <a href="https://1.bp.blogspot.com/-sB9B6SuXhyU/Wgba-NP95xI/AAAAAAAAAA4/Jsej49UgoPQtkvncnUcv7eqkYKj7xfRrACLcBGAs/s1600/earlyprototype_locationstresstest.png" imageanchor="1"><img border="0" src="https://1.bp.blogspot.com/-sB9B6SuXhyU/Wgba-NP95xI/AAAAAAAAAA4/Jsej49UgoPQtkvncnUcv7eqkYKj7xfRrACLcBGAs/s320/earlyprototype_locationstresstest.png" width="320" height="140" data-original-width="1074" data-original-height="471" /></a>
+    </p>
+    <h2>November 8th (Wednesday)</h2>
+    <p>
+        It was finally time to change the project to 3D which I did by copying the template code from 3rd person template. 
+        Also it was time change the character model instead of using the default one so we could finally have the hug animation play instead of jump fall animation. 
+        Which looked like this:
+        <br />
+        <a href="https://2.bp.blogspot.com/-JrqpvxgB5XM/WgbbHmhE7YI/AAAAAAAAAA8/5c3s0rSBf9UKwva0l4Jo-24BiLZ1SeVkwCLcBGAs/s1600/earlyprototype_hugs.png" imageanchor="1"><img border="0" src="https://2.bp.blogspot.com/-JrqpvxgB5XM/WgbbHmhE7YI/AAAAAAAAAA8/5c3s0rSBf9UKwva0l4Jo-24BiLZ1SeVkwCLcBGAs/s320/earlyprototype_hugs.png" width="320" height="141" data-original-width="1068" data-original-height="471" /></a>
+    </p>
+    <p>
+        While I was more casual going to bed at 01.00, Ronja was more hardcore staying up until at least 5.30 tweaking the models to work properly and making the landscape.
+        However little did we know disaster was going to strike because of our inexperience with the engine.
+        <br />
+        <a href="https://3.bp.blogspot.com/-1BNiNnxxpnw/WgbbPawvc1I/AAAAAAAAABE/6ijLrNWb6n0ugBKIHtabqqMQg2J5jlekQCLcBGAs/s1600/landscape.png" imageanchor="1"><img border="0" src="https://3.bp.blogspot.com/-1BNiNnxxpnw/WgbbPawvc1I/AAAAAAAAABE/6ijLrNWb6n0ugBKIHtabqqMQg2J5jlekQCLcBGAs/s320/landscape.png" width="320" height="149" data-original-width="966" data-original-height="451" /></a>
+    </p>
+    <h2>9th November (Thursday, FINAL DAY!)</h2>
+    <p>
+        It's the final day and this gif that Ambershee from the Unreal Slackers Discord posted fits nicely.       
+        <br />
+        <a href="https://media.giphy.com/media/lNMyVfxjfzIJO/giphy.gif" imageanchor="1"><img border="0" src="https://media.giphy.com/media/lNMyVfxjfzIJO/giphy.gif" width="320" height="180" data-original-width="310" data-original-height="174" /></a>
+    </p>
+    <p>
+        I woke up to see the cool progress Ronja had made however something was wrong with the lighting. 
+        We couldn't figure out what exactly so Ronja created a new testing project (Project 333 which became our team name).
+        We thought it was something wrong with a setting somewhere just couldn't figure out where.
+        After transfering few assets to test that everything worked Ronja transfered the rest. 
+        However the map of the old project was ruined in the course of doing that, so always keep a backup copy! 
+        <br />
+        <strong>Mistakes were made.</strong>
+        <br />        
+        It cost us about 6 hours in total for both of us to get back to where we were before the map was "corrupted".
+        <br />
+        <br />
+        Everything worked fine and Ronja made the new map which is how it looks like in the final product. 
+        However when I was done with the wind and we were adding back the game mode the lighting bug happened again. 
+        This time I quickly realized what was wrong. 
+        In the begin play event I was setting the skylight and directional lights intensity to something very low when we were experimenting with the light becoming brighter instead of colour.
+        Something I had done on saturday and completly forgotten about it seems ... :(        
+        <br />
+        <a href="https://2.bp.blogspot.com/-m6M8NwZB-JQ/WgbcXkZ5ARI/AAAAAAAAABQ/sWxCv4lP3JoPzo368znSjDA3uhxUZPcKACLcBGAs/s1600/mapoverview.png" imageanchor="1"><img border="0" src="https://2.bp.blogspot.com/-m6M8NwZB-JQ/WgbcXkZ5ARI/AAAAAAAAABQ/sWxCv4lP3JoPzo368znSjDA3uhxUZPcKACLcBGAs/s320/mapoverview.png" width="320" height="149" data-original-width="1600" data-original-height="745" /></a>
+    </p>
+    <p>
+        The last thing we added to the game was ambient sound from <a href="https://freesound.org/">freesound.org</a>. 
+        However it's supposed to loop but it doesn't which is probably some checkbox we missed somewhere. 
+        So you have ~2 minutes to hug all the villagers to get the happy ambient sound!
+    </p>
+    <p>
+        Finally we decided on a name for the game and because we didn't have a tutorial on how to play the game we named it <strong>E For Hugs</strong>.   
+    </p>
+    <h2>Afterwords</h2>
+    <p>
+        It was very fun and interesting to make a game in such a short time. 
+        I'm very happy with what me and Ronja accomplished in the time we spent on the game.
+        It was my first game jam ever and also the first game shipped with unreal engine so it was cool to do both.
+        There are always things one can do better for example I think it would have been cool to have the saturation spheres slowly grow for a while after you've hugged a villager.
+        Also I tried making the skybox desaturated but I couldn't figure out how to so it's very blue in an otherwise grey world.
+    </p>
+    <p>
+        It's important to have good music or in my case the company of these four dogs on my second monitor throughout the whole Epic MegaJam :)
+        <br />
+        <a href="https://i.imgur.com/6tb3km2.gif" imageanchor="1"><img border="0" src="https://i.imgur.com/6tb3km2.gif" width="180" height="320" data-original-width="450" data-original-height="800" /></a>
+    </p>
+
+    
+</body>
+</html>

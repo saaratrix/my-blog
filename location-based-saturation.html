@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    During the Epic MegaJam 2017 I made one implementation of a Location Based Saturation that over time transitions from being desaturated to fully saturated.
+    This is the technical implementation of that feature.
+    The effect is demonstrated in <a href="https://twitter.com/Roniatrix/status/928713474267545600">this clip.</a>
+    <br />
+    <br />
+    <!--more-->
+    <div id="toc"></div>
+    <div id="contents">
+        <h1>
+            Abstract
+        </h1>   
+        <p>
+            This implementation is for N amounts of locations in the game that will have a sphere of influence if something is desaturated or saturated.
+            The implementation uses 7 material nodes excluding the color input for the <strong>desaturation node</strong>.
+            It uses 4 shader instructions and 15 instructions per location. 
+            For 1 location it would be 19 instructions, for 2 it would be 34 and so on.
+            In the game mode's begin play event it sets the TotalCharacters scalar and tells the characters which Vector parameter they are affecting.
+            The technique is a modification of a <a href="https://www.youtube.com/watch?v=CkEueafOvFg#t=5m55s">tutorial</a> that Alan Willard at Epic Games made.   
+        </p>
+
+        <h1>The material code</h1>
+        <p>
+            The material code for the master material looks like in the image:
+            <br />
+            <a href="https://2.bp.blogspot.com/-JmDmCKjpVUE/WgcBv2-JTrI/AAAAAAAAABg/WcSpgwwhhh00AYwT2oOwp5jjwVrY7OY9gCLcBGAs/s1600/saturationmaterial.png" imageanchor="1"><img border="0" src="https://2.bp.blogspot.com/-JmDmCKjpVUE/WgcBv2-JTrI/AAAAAAAAABg/WcSpgwwhhh00AYwT2oOwp5jjwVrY7OY9gCLcBGAs/s320/saturationmaterial.png" width="320" height="186" data-original-width="1157" data-original-height="673" /></a>
+            <br />            
+            The logic is pretty straight forward. 
+            <ul>
+                <li>Get largest sphere mask value for each location which in this implementation comes from the huggable character.</li>
+                <li>
+                    Add global saturation value and clamp it between 0 and 1. 
+                    If you don't clamp the value it can go negative which inverts the colour.
+                </li>
+                <li>1 - clampedValue will give the desaturation fraction. Which for 1 = desaturated, 0 = saturated</li>
+            </ul>
+        </p>
+        <h2>The HLSL code</h2>
+        <p>
+            The finished HLSL code for the node <strong>GetSaturation</strong> used in the game:
+            <pre class="prettyprint lang-cpp linenums">
+            <code>
+// This returns the largest sphere influence found, if 1 it's it will be fully colored
+// If 0 meaning no sphere has influenced the point.
+float result = 0;	
+
+// Get scalars[0] which is the x value. 
+int totalCharacters = (int)MaterialCollection0.Vectors[0].x;
+	
+for (int i = 0; i < totalCharacters; i++)
+{        
+    // Because Vectors[0] is occupied by the scalar values we need to do i+1 to start at Vectors[1]
+    // xyz = the world position
+	// w = radius of sphere
+    float4 location = MaterialCollection0.Vectors[i + 1];
+
+	// Sphere Mask by copying HLSL code from generated HLSL code from material editor		
+    float3 distance = (location.rgb - worldPosition); // A - B 		
+    float distanceDot = dot(distance, distance); 
+    float squaredDistanceDot = sqrt(distanceDot);
+    float Local4 = (squaredDistanceDot * location.a); 
+    float Local5 = (1.00000000 - Local4);
+    float Local6 = (Local5 * 6.66666508); // 1.0f / FMath::Max(1.0f - HardnessPercent * 0.01f, 0.00001f);  HardnessPercent = 85
+    float sphereMaskValue = min(max(Local6, 0.00000000), 1.00000000); // clamp
+
+    result = max(result, sphereMaskValue);
+}
+	
+return result;
+                </code>
+            </pre>
+
+            There are some things I learned trying to write this HLSL code.
+        </p>
+        <h3>Sphere mask function</h3>
+        <p>
+            Firstly there is no SphereMask function in HLSL as there is when using the material editor node <strong>SphereMask</strong>.
+            Instead I got help from a user called Deathrey on the Unreal Slackers discord in finding out where to look.
+            It was in the unreal engine source file <strong>Engine/Source/Runtime/Engine/Private/Materials/MaterialExpressions.cpp</strong>.
+            With the implementation and the generated HLSL code from the material I understood slowly what was what and how to reimplement the sphere mask functionality.
+            This is the HLSL implementation of a sphere mask node. I tried renaming the variables as UE compiler just names them Local1, Local2, ...
+            <pre class="prettyprint linenums lang-cpp">
+                <code>	
+// A - B 	
+float3 distance = (A.rgb - B.rgb); 
+                    
+float distanceDot = dot(distance, distance); 
+float length = sqrt(distanceDot);
+float scaledLength = (length * radius); 
+float Local5 = (1.00000000 - scaledLength);
+
+// The value 6.66...  is precomputed by UE shader compiler by the following c++ logic:
+// HardnessPercent = 85.0f
+// 1.0 / FMath::Max(1.0f - HardnessPercent * 0.01f, 0.00001f);  
+float Local6 = (Local5 * 6.66666508); 
+float sphereMaskValue = min(max(Local6, 0.00000000), 1.00000000); // clamp
+                </code>
+            </pre>
+        </p>
+        <h3>MaterialCollection0</h3>
+        <p>
+            Initially I tried to access the scalars &amp; vectors this way. 
+            There's not a lot of documentation on Material Parameter Collection usage in material expression custom nodes that I could find.
+            <pre class="prettyprint linenums lang-cpp">
+                <code>
+MaterialCollection0.Scalars[0]
+MaterialCollection0.Vectors[0]
+                </code>
+            </pre>
+
+            I used this <a href="https://answers.unrealengine.com/questions/554250/using-arrays-in-materials.html">unreal engine forum post</a> to learn how to use the Vectors.
+            It didn't mention how to use the Scalars. 
+            Which I learned by digging through the unreal engine source code!
+            The scalars occupy the first (N / 4) amount of array entries for the Vectors so for example 3 scalars it occupies <strong>Vectors[0]</strong> and for 5 scalars it would be [0] and [1].
+            <br />
+            One final important thing that the user in the forum post wrote is this: 
+            <br />
+            <strong>Actually they can only be read if at least one Parameter is set as an input for your custom expression.</strong>
+            <br />
+            Which in the implementation is automatically solved through the <strong>Global Saturation</strong> scalar parameter.
+        </p>
+
+        <h1>The game mode blueprint code</h1>
+        <p>
+            The totalCharacters was set by getting the total amount of characters and store it in an int. 
+            It was also used to check for win condition!
+            <br />
+            <a href="https://4.bp.blogspot.com/-yr_V0M7ZIbw/WgcB3LTzrvI/AAAAAAAAABk/KHQVKkQD9uIIebasfWcNwPEfozb0mUCPgCLcBGAs/s1600/totalcharacters.png" imageanchor="1"><img border="0" src="https://4.bp.blogspot.com/-yr_V0M7ZIbw/WgcB3LTzrvI/AAAAAAAAABk/KHQVKkQD9uIIebasfWcNwPEfozb0mUCPgCLcBGAs/s320/totalcharacters.png" width="320" height="148" data-original-width="520" data-original-height="241" /></a>
+        </p>
+        <p>
+            The material parameter collection vector slots were set on begin play by iterating over all characters and use their index in the array.
+            <a href="https://2.bp.blogspot.com/-7z5WmLVPsvI/WgcB8pB7ZII/AAAAAAAAABo/UsRKi31lIYMA8tUHdJoKeebaMhbvATbygCLcBGAs/s1600/setslot.png" imageanchor="1"><img border="0" src="https://2.bp.blogspot.com/-7z5WmLVPsvI/WgcB8pB7ZII/AAAAAAAAABo/UsRKi31lIYMA8tUHdJoKeebaMhbvATbygCLcBGAs/s320/setslot.png" width="320" height="119" data-original-width="1178" data-original-height="439" /></a>
+        </p>
+
+        <h1>When a character was hugged</h1>
+        <p>
+            When a character was hugged all that's needed to do is update the Vector slot in the material parameter collection. 
+            Which was done on tick while the character was hugged by increasing the sphere of influence's radius.
+            The saturation sphere variable is a Sphere Collision. 
+            <a href="https://1.bp.blogspot.com/-s3NVsyDr588/WgcCDGlo-UI/AAAAAAAAABs/IBw6yENFAU86YPMqauxedbIQVFovQ0oZQCLcBGAs/s1600/updateslot.png" imageanchor="1"><img border="0" src="https://1.bp.blogspot.com/-s3NVsyDr588/WgcCDGlo-UI/AAAAAAAAABs/IBw6yENFAU86YPMqauxedbIQVFovQ0oZQCLcBGAs/s320/updateslot.png" width="320" height="116" data-original-width="1208" data-original-height="439" /></a>
+        </p>
+
+        <h1>Conclusion</h1>
+        <p>
+            I'm happy with the result and it looks great ingame. 
+            <br />
+            I was worried about performance initially when going up to 8+ characters since it's every material in the whole game doing this but on my pc it ran fine.
+            <br />
+            There's probably a better way of doing the location based saturation but this is what I came up with during the Epic MegaJam 2017.            
+        </p>        
+    </div>
+</body>
+</html>
