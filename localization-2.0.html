@@ -19,14 +19,14 @@
         <p>
             A localized routing example for ASP.NET Core 2.1.2 MVC.
             The solution uses attributes on the controllers and actions to determine the localized routing for each different culture.
-            A convention is added in Startup.cs to iterate over all the controllers and actions to set their routes based on the localized attributes.
+            A convention is added in Startup.cs to iterate over all the controllers and actions to set their routes based on the <strong>[LocalizedRoute]</strong> attributes.
             <pre class="prettyprint"><code>services.AddMvc(options => { options.Conventions.Add(new LocalizedRouteConvention()); });</code></pre>
         </p>
         <!--more-->
         <h1>
             Introduction and features
         </h1>
-        2 years ago (2015) I wrote a <a href="/2016/01/localized-routing-aspnet-5-mvc-6.html">blog post</a> detailing how I did localized routing for ASP.NET Core 1.0 MVC Release candidate 1.
+        In January 2016 I wrote a <a href="/2016/01/localized-routing-aspnet-5-mvc-6.html">blog post</a> detailing how I did localized routing for ASP.NET Core 1.0 MVC Release candidate 1.
         A reader wrote a comment saying things had changed and some things were deprecated so I decided to update the localized routing solution.
         It turns out a lot has changed!
         There were so many changes that it was easier to recreate the whole project and copy the localization code.
@@ -68,8 +68,10 @@
         <h2>
             Similar Projects
         </h2>
-        With these goals in mind I started looking around the web for solutions to implement. The solution closest to what I needed I found here: <a href="http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/">http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/</a>&nbsp;. I did not like this for 2 reasons. <br />
-        1. His way of initializing the routes. It was not how I wanted to do it.
+        With these goals in mind I started looking around the web for solutions to implement. The solution closest to what I needed I found here: <a href="http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/">http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/</a>&nbsp;.
+        I did not like this for 2 reasons.
+        <br />
+        1. Their way of initializing the routes. It was not how I wanted to do it.
         <br />
 <pre class="prettyprint lang-cs linenums">
 <code>
@@ -110,7 +112,6 @@ var localizedRoutes = new Dictionary&lt;string LocalizedRouteInformation=[]&gt;(
         <br />
         I also looked at other examples they are for mvc 5 or earlier but also had things I either didn't understand due to lack of knowledge or things that it was missing. 
         So in the end I decided to write my own solution and thus here is how I solved localized routing!
-
         <br />
         <h1>
             Implementation
@@ -279,7 +280,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
         /// &lt;/summary&gt;
         public string Route { get; set; }
         /// &lt;summary&gt;
-        /// What the linktext is for a Html.ActionLink
+        /// What the link text is for a Html.ActionLink
         /// &lt;/summary&gt;
         public string Link { get; set; }
 
@@ -397,7 +398,7 @@ public class LocalizationController : Controller
             TagHelperAttribute hrefAttribute = output.Attributes.FirstOrDefault(x => x.Name == "href");
             string originalHref = hrefAttribute.Value as string;
 
-            string originalCulture = LocalizationDataHandler.GetCultureFromHref(originalHref);
+            string originalCulture = LocalizationDataHandler.GetCultureFromUrl(originalHref);
 
             // Get the controllerName and actionName
             string controllerName = context.AllAttributes["asp-controller"].Value as string;
@@ -468,6 +469,14 @@ public class LocalizationController : Controller
     }
 </code>   
 </pre>
+        <h2>
+            CultureFormLinkTagHelper.cs
+        </h2>
+        <p>
+            The &lt;form&gt; tag helper is a simpler version than the &lt;a&gt; tag helper.
+            Source for the tag helper can be found on github here:
+            <a href="https://github.com/haestflod/asp.net-mvc-core-1.0-localized-routing/blob/master/localization/Localization/CultureFormLinkTagHelper.cs">github.com/haestflod/asp.net-mvc-core-1.0-localized-routing/blob/master/localization/Localization/CultureFormLinkTagHelper.cs</a>
+        </p>
         <h2>LocalizedRouteConvention.cs</h2>
         This is the heart in setting up all the routing.
         It iterates over all controllers and all the actions in each controller.
@@ -565,7 +574,7 @@ public class LocalizationController : Controller
         {
             // Get all the LocalizedRouteAttributes from the controller
             var controllerLocalizations = a_controller.Attributes.OfType&lt;LocalizedRouteAttribute&gt;().ToList();
-            // The controllerName (writing a_controller. every time is hard yo!)
+            // The controllerName (writing a_controler. everytime is hard yo!)
             string controllerName = a_controller.ControllerName;
 
             // If the controller is the default controller then add the "/" route by adding an empty ""
@@ -619,7 +628,6 @@ public class LocalizationController : Controller
                 if (controllerName == LocalizationDataHandler.DefaultController)
                 {
                     tempName = "";
-
                 }
                 string template = culture.Value + "/" + tempName;
 
@@ -653,7 +661,6 @@ public class LocalizationController : Controller
                 // If there is no[Route()] Attribute then create one for the route.
                 if (defaultSelectionModel == null || defaultSelectionModel.AttributeRouteModel == null)
                 {
-                    //action.AttributeRouteModel = new CultureAttributeRouteModel(DefaultCulture);
                     AttributeRouteModel attributeRouteModel = new AttributeRouteModel();
 
                     if (action.ActionName != LocalizationDataHandler.DefaultAction)
@@ -680,8 +687,15 @@ public class LocalizationController : Controller
 
                     for (int i = 0; i &lt; actionComponents.Length; i++)
                     {
+                        string actionComponent = actionComponents[i];
+                        // Incase of "/action/"
+                        if (actionComponent.Length == 0)
+                        {
+                            continue;
+                        }
+
                         // Check if first character starts with {
-                        if (actionComponents[i][0] == '{')
+                        if (actionComponent[0] == '{')
                         {
                             parameterTemplate += "/" + actionComponents[i];
                         }
@@ -695,15 +709,27 @@ public class LocalizationController : Controller
                 foreach (LocalizedRouteAttribute attribute in actionLocalizationsAttributes)
                 {
                     string route = attribute.Route + parameterTemplate;
+                    // This copies all existing Attributes on the ActionModel,  [Route] [HttpGet] e.t.c.
+                    // Sourcefile: https://github.com/aspnet/Mvc/blob/dev/src/Microsoft.AspNetCore.Mvc.Core/ApplicationModels/ActionModel.cs
                     ActionModel newLocalizedActionModel = new ActionModel(action);
-                    // Clear the Selectors or it will have shared selector data
+
+                    // Clear the Selectors or it will have shared selector data from default route.
+                    // This however clears the ActionConstraints like [HttpGet] and [HttpPost]
                     newLocalizedActionModel.Selectors.Clear();
                     AttributeRouteModel newLocalizedAttributeRouteModel = new AttributeRouteModel();
-                    newLocalizedAttributeRouteModel.Template = attribute.Route;
+                    //newLocalizedAttributeRouteModel.Template = attribute.Route;
+                    newLocalizedAttributeRouteModel.Template = route;
                     // Add the new actionModel for adding to controller later
                     newActions.Add(newLocalizedActionModel);
 
                     AddAttributeRouteModel(newLocalizedActionModel.Selectors, newLocalizedAttributeRouteModel);
+                    // Bug mentioned by anonymous through a comment on blog.
+                    // This is where the [HttpGet], [HttpPost] constraints are added back after being cleared earlier.
+                    foreach(var actionConstraint in action.Selectors.Where(x =&gt; x.ActionConstraints.Count &gt; 0).SelectMany(x =&gt; x.ActionConstraints))
+                    {
+                        newLocalizedActionModel.Selectors[0].ActionConstraints.Add(actionConstraint);
+                    }
+
                     // Add the localized route for the action
                     // Example of final route:  "fi/koti" + "/" + "ota_yhteyttä"
                     LocalizationDataHandler.AddActionData(controllerName, actionName, attribute.Culture, attribute.Route, attribute.Link);
@@ -904,17 +930,16 @@ public class LocalizationController : Controller
         /// &lt;/summary&gt;
         /// &lt;param name="a_href"&gt;&lt;/param&gt;
         /// &lt;returns&gt;&lt;/returns&gt;
-        public static string GetCultureFromHref(string a_href)
+        public static string GetCultureFromUrl(string a_url)
         {
-            string result = DefaultCulture;
             foreach(string culture in SupportedCultures)
             {
-                if (a_href.StartsWith("/" + culture + "/"))
+                if (a_url.StartsWith("/" + culture + "/"))
                 {
-                    result = culture;
+                    return culture;
                 }
             }
-            return result;
+            return DefaultCulture;
         }
     }
 </code>
@@ -933,7 +958,7 @@ public class LocalizationController : Controller
     public class CultureControllerData
     {
         /// &lt;summary&gt;
-        /// Different controllernames in different cultures
+        /// Different names of the controller in different cultures
         /// &lt;/summary&gt;
         public ConcurrentDictionary&lt;string, string&gt; Names { get; }
         /// &lt;summary&gt;
@@ -995,7 +1020,7 @@ public class LocalizationController : Controller
         I added some localization routes for the the Home controller.
         <pre class="prettyprint linenums">
 <code>
-    // This is not neccesary if Home is the defaultcontroller, automatically happens!    
+    // This is not necessary if Home is the defaultcontroller, automatically happens!
     [LocalizedRoute("fi")]
     [LocalizedRoute("sv")]
     public class HomeController : LocalizationController
@@ -1132,6 +1157,31 @@ public class LocalizationController : Controller
 </code>
 </pre>
         There also needs to be an extra argument to tell the tag helper not to overwrite the image in my example as the current functionality would do that.
+
+        <h1>Changes made after initial version</h1>
+        <p>
+            Here is a list of changes made to fix bugs or other improvements after this was posted on 2017.12.27.
+            <br />
+            The full changelog can be found here: <a href="https://github.com/haestflod/asp.net-mvc-core-1.0-localized-routing/blob/master/changelog.md">github.com/haestflod/asp.net-mvc-core-1.0-localized-routing/blob/master/changelog.md</a>.
+        </p>
+        <h2>2.0.1</h2>
+        <p>
+            A <a href="#c604682135716155167">comment</a> by an anonymous poster to this blog post notified me of a bug with [HttpGet] and [HttpPost].
+            The bug was in the file <a href="https://github.com/haestflod/asp.net-mvc-core-1.0-localized-routing/blob/master/localization/Localization/LocalizedRouteConvention.cs#L214"><strong>LocalizedRoutingConvention.cs</strong></a>.
+            When the ActionModel's Selectors property was cleared the action constraints such as [HttpPost] were removed.
+            So the solution that the anonymous commenter gave fixed the bug by adding the action constraints back to the selectors.
+        </p>
+        <p>
+            Improved routing generated from anchor TagHelper when using <pre><code>asp-route-parameter</code></pre>.
+            This was done through updating the LocalizedRouteConvention.cs so that it used the variable <pre><code>string route = attribute.Route + parameterTemplate;</code></pre>.
+            Instead of just using the <pre><code>attribute.Route</code></pre>
+        </p>
+        <p>
+            Updated parameters example to include [HttpPost] with form data.
+        </p>
+        <p>
+            Added <strong>cms-culture</strong> TagHelper to &lt;form&gt; which works the same way as for the &lt;a&gt; tag.
+        </p>
     </div>
 </body>
 </html>
