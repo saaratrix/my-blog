@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <p>
+        I wanted to use an automatic table of content script to generate a TOC if necessary for this blog.
+        I picked a script written by <a href="https://stackoverflow.com/users/23501/ates-goral">Ates Goral</a> on stackoverflow: <a href="https://stackoverflow.com/a/187946">stackoverflow.com/a/187946.</a>
+    </p>
+    <p>
+        When I was writing the <a href="/2016/01/localized-routing-aspnet-5-mvc-6.html">Localization Routes post</a> I noticed that some of the table content links weren't working properly.
+        The error was that some headings were called ____________Id____________.
+        So instead of trying to understand why the table of content script wasn't working I decided to write my own for fun.
+    </p>
+    <p>
+        I made the automatic table of content generation using typescript and the code is in the snippet below.
+        What the code does is look for a <strong>#toc</strong> and <strong>#content</strong> element.
+        Then it finds all the <strong>h1</strong> to <strong>h6</strong> elements inside the <strong>#content</strong> element.
+        The cool part is that querySelectorAll() returns them in order of appearance so there's no need to sort them.
+        So it's just a matter of iterating over each heading element and increase/decrease the level of the ToC.
+        <br />
+        The code can be found on <a href="https://github.com/haestflod/table-of-contents">github</a> or in the snippet below: here.
+        <pre class="prettyprint linenums">
+        <code>
+"use strict";
+module HF
+{
+    class ToC
+    {
+        public m_level: number = 0;
+        public m_currentLists: HTMLUListElement[] = [];
+        constructor(a_tocId: string = "toc", a_contentId: string = "contents")
+        {
+            var tocElement: HTMLElement = document.getElementById(a_tocId);
+            var contentElement: HTMLElement = document.getElementById(a_contentId);
+            // Make sure the 2 elements exists in the DOM
+            if (tocElement && contentElement)
+            {
+                var headerElements: NodeList = contentElement.querySelectorAll("h1, h2, h3, h4, h5, h6");
+                this.createToC(tocElement, headerElements);
+            }
+        }
+        public createToC(a_tocElement: HTMLElement, a_headerElements: NodeList): void
+        {
+            var hlen: number = a_headerElements.length;
+            var documentFragmentElement: DocumentFragment = document.createDocumentFragment();
+            for (var i: number = 0; i &lt; hlen; ++i)
+            {
+                var headerElement: HTMLHeadingElement = a_headerElements[i] as HTMLHeadingElement;
+                this.createToCElement(headerElement, documentFragmentElement, a_tocElement.id);
+            }
+            // Set the toc element title.
+            // First I only appended the documentFragment but then in blogger the preview texts it said "Table of Contents:"  and no table!
+            a_tocElement.innerHTML = "Table of Content:";
+            a_tocElement.appendChild(documentFragmentElement);
+            // Remove the hide class
+            a_tocElement.className = "";
+        }
+        public createToCElement(a_headerElement: HTMLHeadingElement, a_documentFragment: DocumentFragment, a_tocId: string): void
+        {
+            var headingLevel: number = parseInt(a_headerElement.nodeName[1], 10);
+
+            this.gotoLevel(headingLevel, a_documentFragment);
+
+            var currentListElement: HTMLUListElement = this.m_currentLists[this.m_level];
+            var toTopLink: HTMLAnchorElement = document.createElement("a") as HTMLAnchorElement;
+            toTopLink.href = "#" + a_tocId;
+            var headerCloneElement: HTMLHeadingElement = a_headerElement.cloneNode(true) as HTMLHeadingElement;
+            toTopLink.appendChild(headerCloneElement);
+            a_headerElement.parentNode.replaceChild(toTopLink, a_headerElement);
+            // Because id's can become "           id           "
+            var id = a_headerElement.innerHTML.trim();
+            headerCloneElement.id = id;
+            headerCloneElement.innerHTML = id;
+            var listItem = document.createElement("li");
+            listItem.innerHTML = "&lt;a href='#" + id + "'&gt;" + id + "&lt;/a&gt;";
+            currentListElement.appendChild(listItem);
+        }
+        private gotoLevel(a_headingLevel: number, a_documentFragment : DocumentFragment): void
+        {
+            // Can skip the if statements and just do the 2 whiles one after another if you want, I like the ifs!
+            if (this.m_level &lt; a_headingLevel)
+            {
+                // This is important otherwise &lt;ul&gt; tags would be missing when jumping up and down in header levels.
+                while (this.m_level &lt; a_headingLevel)
+                {
+                    // increase level by 1!
+                    this.m_level++;
+                    // Create the ul for this heading level
+                    this.m_currentLists[this.m_level] = document.createElement("ul");
+                    // If level is 1 then add to the ToC fragment
+                    if (this.m_level == 1)
+                    {
+                        a_documentFragment.appendChild(this.m_currentLists[1]);
+                    }
+                    // Else add it to the parent list
+                    else
+                    {
+                        this.m_currentLists[this.m_level - 1].appendChild(this.m_currentLists[this.m_level]);
+                    }
+                }
+            }
+            // If current level is higher than the new headinglevel
+            else if (this.m_level &gt; a_headingLevel)
+            {
+                while (this.m_level &gt; a_headingLevel)
+                {
+                    // remove the list at the current level
+                    this.m_currentLists[this.m_level] = undefined;
+                    this.m_level--;
+                }
+            }
+        }
+    }
+    // Put the load code last just incase!
+    var loaded = false;
+    document.addEventListener("DOMContentLoaded", function ()
+    {
+        var toc = new ToC();
+        loaded = true;
+    });
+    window.addEventListener("load", function ()
+    {
+        // If the DOMContentLoaded never fired.
+        if (!loaded)
+        {
+            var toc = new ToC();
+        }
+    });
+
+}
+        </code>
+        </pre>
+    </p>
+    <p>
+        Now what I learned was that Ates Goral's script worked just fine.
+        It however was my heading tags that had tabs and many spaces in them which generated the ____________Id____________.
+        Which is the reason the <b>trim()</b> function is used.
+        <br />
+        So the point of this whole post is that here is another ToC auto generator but now written in typescript!
+    </p>
+
+</body>
+</html>
