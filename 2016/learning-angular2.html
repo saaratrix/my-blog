@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>    
+    <p>
+        I've been wanting to try out angular2 for a while and decided to add angular2 to an existing node.js express project that I used to learn express.
+        The project code can be found here: <a href="https://github.com/haestflod/glossarytraining">https://github.com/haestflod/glossarytraining</a>
+        <br />
+        There is also a demo here where I removed the backend part so it works for gh-pages: <a href="http://haestflod.github.io/glossarytraining/public/exam.html">http://haestflod.github.io/glossarytraining/public/exam.html</a>
+        <br />
+        The finished project covers the basics of angular2 with input &amp; output variables for components and services.
+    </p>
+    <!--more-->
+    <div id="toc">
+        Table of content:
+    </div>
+    <div id="contents">
+        <h1>Introduction</h1>
+        <p>
+            Prior to this I had never used ES6 modules before.
+            I've always kept the code to namespaces instead of importing modules so it was more than just angular2 to learn.
+            But when I started the project of adding angular2 I thought it'd be about as simple as adding angular 1 but I was oh so wrong about that.
+        </p>
+        <h2>Installation for Visual Studio 2013</h2>
+        <p>
+            I started with searching for <strong>angular2 installation guide</strong> which lead me here <a href="https://angular.io/docs/ts/latest/quickstart.html">https://angular.io/docs/ts/latest/quickstart.html</a>.
+            My existing project was created using visual studio 2013 node.js project template so it had no <strong>tsconfig</strong> file or gulpfile and on top of that I had express folder structure so what was in public folder is what is accessible.
+            <br />
+            Because visual studio was auto compiling typescript for me I didn't create the <strong>tsconfig</strong> file initially but in the end I had to.
+            I couldn't get the application to compile and work without the recommended tsconfig settings.
+            Now that it was compiling without any components I continued following the guide and created my first component in the folder
+            <strong>public/js/examangular</strong> and then tried to compile the typescript.
+            The code did not want to compile again because angular2 was missing a Promise reference.
+            <br />
+            That was solved by adding references for typescript like this:
+            <br />
+            <script src="https://gist.github.com/haestflod/26d9c38b4557a596a844ab60e848753c.js"></script>
+        </p>
+        <h3>SystemJS setup</h3>
+        <p>
+            The code was compiling but when trying to run it in the browser I got errors.
+            Next I needed to configure systemJS correctly.
+            I have never used it before and I started out using systemjs incorrectly.
+            Based off the angular quick start tutorial my systemjs file looked like in the gist below.
+            <br />
+            <script src="https://gist.github.com/haestflod/5b8616e2fa51ea8cda2008c02c9a05d5.js"></script>
+            <br />
+        </p>
+        <p>
+            It did not work.
+            It gave 404 error by trying to load the file <strong>js/examangular/main</strong>.
+            It took me a while to find out why.
+            I tried many small tweaks for example to add .js to the import statement.
+            <br />
+            The thing that helped me the most to figure out how to solve the error was this github project: <a href="https://github.com/buckyroberts/angular-2-template">https://github.com/buckyroberts/angular-2-template</a>
+        </p>
+        <p>
+            What I learned was that the package name mattered a lot.
+            I thought you could call it anything but the package name had to be called <strong>js</strong>.
+            Because the first word in the import statement is js.
+            So after changing the package name like this:
+            <br />
+            <script src="https://gist.github.com/haestflod/423e230cf9f2223a9739f6bea69ff877.js"></script>
+            <br />
+            It all worked now!
+            I finally had my hello world angular2 application up and running.
+            <br />
+            <br />
+            If the path had been <strong>examapp/main</strong> instead of <strong>js/examapp/main</strong> then the package would have been called <strong>examapp</strong>.
+        </p>        
+        <h1>The app code</h1>
+        <p>
+            The angular typescript app code is in the <a href="https://github.com/haestflod/glossarytraining/tree/master/public/examapp">public/examapp</a> folder.
+            If sessionStorage is empty the app component uses the &lt;exam-selection&gt; component.
+            Where you select the test you want to do.
+            Otherwise it uses the test component to do the actual test.
+            Currently if you finish a test there is no way to clear sessionStorage so you need to do that manually or open a new tab.
+        </p>
+        <p>
+            The other code in the app is an express.js app for backend administration using passport.js for authentication.
+            For the views it's using <a href="https://github.com/kirbysayshi/vash">vash</a> as the view engine to use ASP.NET Razor syntax over the more common jade.
+            You can create words, categories for the word and tests where you by clicking a checkbox adds/removes a word to the test.
+            I originally was going to try using <strong>Redis</strong> as database but I changed to MySQL when I realized that the application would be very heavy on relations between objects.
+        </p>
+        <h1>My thoughts on angular2</h1>
+        <p>
+            After working with angular2 I like it over angular1 (angularjs) but they are structured similarly with components, services and so on.
+            The syntax was quite different in 2 compared to 1 but after getting used to it I like it.
+            I also prefer writing in typescript over javascript but I'm sure you can write angular 1 in typescript as well.
+            I didn't try everything there is in angular2 but most of the basic things can be found in this project.
+        </p>
+    </div>
+</body>
+</html>
