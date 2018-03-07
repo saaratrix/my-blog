@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>    
+    <p>
+        I wrote an app using Angular 5 that does many of the basic features in Angular.
+        The backend uses Node.js, Express and MySQL.
+	</p>
+    <!--more-->
+    <div id="toc" class="hide"></div>
+    <div id="contents">
+        <h1>
+            Introduction
+        </h1>
+		<p>
+            My new years resolution for 2018 is to get a lot better at finnish.
+            So I wanted an app to help me practice words and phrases repeatedly if necessary.
+            I had already written a <a href="/2016/05/learning-angular2.html">similar app</a> that I had barely used in 2016.
+            But now I wanted to update the app and at the same time learn Angular 5!
+		</p>
+        <p>
+            The app's source code can be found here: <a href="https://github.com/haestflod/glossarytraining">github.com/haestflod/glossarytraining</a>.
+            It uses many of the basic features of Angular such as components, modules, routes and child routes.
+            Here's a nice cheat sheet for Angular: <a href="https://angular.io/guide/cheatsheet">angular.io/guide/cheatsheet</a>.
+            I'm using Less for CSS and the backend is written using <a href="https://expressjs.com/">Express</a> to handle communicating with the MySQL database.
+        </p>
+        <p>
+            The app can be tested here: <a href="moo">haestflod.github.io/glossarytraining/dist/index.html</a>
+        </p>
+
+        <h1>Learning Angular</h1>
+        <p>
+            To learn Angular I mainly used 2 resources.
+            <br />
+            1. <a href="https://angular.io/">angular.io/</a> - Which is Angular's own website.
+            <br />
+            2. <a href="https://github.com/gothinkster/angular-realworld-example-app">github.com/gothinkster/angular-realworld-example-app</a>
+            - Which I used as a guide on how to structure the app and other things such as how the routing was done.
+        </p>
+        <p>
+            Any issues I came across I either used angular.io or searched for solution.
+        </p>
+        <h2>Creating the app</h2>
+        <p>
+            To create the Angular app I followed the guide here: <a href="https://angular.io/guide/quickstart">angular.io/guide/quickstart.</a>
+            The guide doesn't mention how to create an app using Less or Sass.
+            Which you do by doing the following:
+            <br />
+            <br />
+            <code>
+ng new my-app --style=less
+            </code>
+        </p>
+
+
+        <p>
+            Since I followed the angular.io guide I had to edit the <strong>.angular-cli.json</strong> file to add Less.
+            I edited 2 properties from <strong>CSS</strong> to <strong>Less</strong>
+        </p>
+        <pre class="prettyprint lang-js linenums">
+            <code>
+"styles": [
+    "styles.less"
+],
+"defaults": {
+    "styleExt": "less",
+    "component": {
+    }
+}
+            </code>
+        </pre>
+
+        <h2>Lessons learned</h2>
+        <p>
+            When making the app I took notes of issues I had and how to solve them.
+            This is what I learned!
+        </p>
+
+        <h3>Add modules of what is used to the *.module.ts file</h3>
+        <p>
+            This one is intuitive when you've learned the basics of Angular but as I started I got errors about using <strong>HttpClient</strong>.
+            Which was solved by adding the <strong>HttpClientModule</strong> to the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/shared/shared.module.ts">/shared/shared.module.ts</a> file.
+        </p>
+        <p>
+            The module needs to be added to the <strong>*.module.ts</strong> file that does the declaration for the component using the model.
+            For example for my admin view I had to add the <strong>FormsModule</strong> in the <strong>admin.module.ts</strong>.
+            I could not add it in the <strong>app.module.ts</strong> or the <strong>shared.module.ts</strong>.
+            It threw an error about ngModel directive until I added it to the <strong>admin.module.ts</strong>
+        </p>
+
+        <h3>Exporting a component</h3>
+        <p>
+            If component A wants to use component B and component B is declared in a different module.
+            Then the other module needs to export component B so that component A can use it.
+            Otherwise it throws an error about the <strong>@Input()</strong> parameters.
+        </p>
+        <p>
+            Example is my <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/home/home.component.html">home component</a> wants to use the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/quiz/quiz-selection/quiz-selection.component.ts">quiz selection component</a>.
+            <br />
+            Then the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/quiz/quiz.module.ts">quiz module</a> needs to export the <strong>quiz selection component</strong>.
+            <br />
+            And the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/home/home.module.ts">home module</a> needs to import the <strong>quiz module</strong>.
+        </p>
+
+        <h3>Creating services</h3>
+        <p>
+            When you're creating a service the service needs to be added to the providers array of the module exporting the service.
+            Example here: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/shared/shared.module.ts">shared module.</a>
+        </p>
+
+        <h3>Detect changes in array</h3>
+        <p>
+            When passing an array to a component and the array is changed outside the component with for example <code>array.push()</code> then the component doesn't know that the array has changed without adding an <strong>IterableDiffers</strong>.
+            <br />
+            Example of IterableDiffers being used: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/phrase/phrases-selection/phrases-selection.component.ts">phrases selection component.</a>
+            <br />
+            The component is being used here: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/admin/phrases/phrases-quiz-selection/phrases-quiz-selection.component.html">phrases quiz selection component.</a>
+        </p>
+
+        <h3>Getting HTML element in component</h3>
+        <p>
+            You can get a reference to a HTML element by using <code>@ViewChild("id") element: ElementRef</code> for <code>&lt;div #id&gt;&lt/div&gt;</code>
+            <br />
+            Example of <code>@ViewChild("questionInput")</code> being used: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/quiz/quiz-text-question/quiz-text-question.component.ts">quiz text question component.</a>
+            <br />
+            The element that's referenced in the example looks like this: <code>&lt;input #questionInput &gt;</code>
+        </p>
+
+        <h3>CSS Grid is nice!</h3>
+        <p>
+            It was my first time using CSS Grid and it's very nice to use.
+            I used this tutorial to learn it: <a href="https://css-tricks.com/snippets/css/complete-guide-grid/">css-tricks.com/snippets/css/complete-guide-grid</a>
+            <br />
+            Below is the whole CSS to make it into a 3 column grid that works for dynamic heights.
+        </p>
+        <pre class="prettyprint lang-css linenums">
+            <code>
+.questions-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 8px;
+}
+            </code>
+        </pre>
+        <p>
+            As demonstrated it's very simple to use!
+            An added bonus is that it also shows up in chrome when using inspect element with debugging tools.
+            <br />
+            <a href="https://2.bp.blogspot.com/-QNcZ4XNJwm0/Wp_rz7hqSOI/AAAAAAAAAEY/Ot-MGKCvO6owI4mzuYg3QXolYUz8mNEIgCPcBGAYYCw/s1600/gridlayout.png" imageanchor="1" >
+                <img border="0" src="https://2.bp.blogspot.com/-QNcZ4XNJwm0/Wp_rz7hqSOI/AAAAAAAAAEY/Ot-MGKCvO6owI4mzuYg3QXolYUz8mNEIgCPcBGAYYCw/s320/gridlayout.png" width="320" height="83" data-original-width="1139" data-original-height="297" />
+            </a>
+        </p>
+
+        <h3>Mistake when using Less</h3>
+        <p>
+            When using <a href="https://canjs.com/">CanJS</a> I've always encapsulated the component CSS with the components tag.
+            CanJS is another framework that uses reusable components to create a web app.
+            So encapsulating was a habit to make sure the CSS is properly scoped.
+            This however is not how it works in Angular because it does it for you automatically.
+            As a workaround until properly fixed I had to import each component's style file into the global <a href="https://github.com/haestflod/glossarytraining/blob/master/src/styles.less">styles.less</a> file.
+        </p>
+        <p>
+            Here's an example of what I did wrong when I encapsulated the CSS for the <strong>&lt;app-admin&gt;</strong> component.
+        </p>
+        <pre class="prettyprint lang-css linenums">
+            <code>
+/* This didn't work without my @import workaround! */
+app-admin {
+    nav {
+        margin-bottom: 15px;
+    }
+}
+            </code>
+        </pre>
+        <p>
+            Correct way is to just omit the app-admin part and leave it like this:
+        </p>
+        <pre>
+            <code class="prettyprint lang-css linenums">
+/*
+    This works perfectly because Angular handles the encapsulating for you automatically!
+    Angular transforms the nav into nav[_ngcontent-c6] which makes sure the CSS is only for the navs of _ngcontent-c6 component.
+*/
+nav {
+    margin-bottom: 15px;
+}
+            </code>
+        </pre>
+
+        <h2>The express backend</h2>
+        <p>
+            The Express app is based off the template here: <a href="https://github.com/designcourse/mean4plus">github.com/designcourse/mean4plus.</a>
+            Which was to make sure it worked with Angular.
+            <br />
+            The API routes entry point is in the file <a href="https://github.com/haestflod/glossarytraining/blob/master/server/routes.ts">/server/routes.ts</a>
+            <br />
+            The backend uses <a href="https://github.com/mysqljs/mysql">MySQL</a> npm package to communicate with the database.
+            I wrote a <a href="https://github.com/haestflod/glossarytraining/blob/master/server/database/mysql-connection.ts#L31">generic query function</a> to always return a promise to use for async/await.
+            <br />
+            The generic query is demonstrated in the <a href="https://github.com/haestflod/glossarytraining/blob/master/server/handlers/BaseHandler.ts#L20">/server/handlers/BaseHandler.ts</a>
+            <br />
+            The server also has its own tsconfig.json which is compiled before launching server using the <a href="https://github.com/haestflod/glossarytraining/blob/master/package.json#L12">start-server</a> script in package.json.
+        </p>
+
+        <h1>Conclusion</h1>
+        <p>
+            I like Angular and it's a powerful tool building web applications.
+            That's true for many frameworks though :)
+            <br />
+            I'll be continue working on the glossary training app and the next feature to implement is verb training, <strong>I am, you are, it is ...</strong>
+            <br />
+            Hopefully next year I'll be speaking fluent finnish!
+        </p>
+    </div>
+</body>
+</html>
