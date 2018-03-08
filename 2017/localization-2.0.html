@@ -68,7 +68,7 @@
         <h2>
             Similar Projects
         </h2>
-        With these goals in mind I started looking around the web for solutions to implement. The solution closest to what I needed I found here: <a href="http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/">http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/</a>&nbsp;.
+        With these goals in mind I started looking around the web for solutions to implement. The solution closest to what I needed I found here: <a href="https://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/">www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/</a>&nbsp;.
         I did not like this for 2 reasons.
         <br />
         1. Their way of initializing the routes. It was not how I wanted to do it.
@@ -191,7 +191,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
         <p>
             This is the class added in the Request Localization section above. ASP.NET on every request uses RequestProviders to set the culture.
             The default ones that ASP.NET have are header, cookie and query string provider.
-            You can read more about it <a href="http://www.jerriepelser.com/blog/how-aspnet5-determines-culture-info-for-localization" target="_blank">on this website</a>.
+            You can read more about it <a href="https://www.jerriepelser.com/blog/how-aspnet5-determines-culture-info-for-localization" target="_blank">on this website</a>.
             I looked at the source code of ASP.NET localization to write my UrlCultureProvider.
             My implementation <b>ONLY</b> supports 2 letters to figure out the culture.
             So the UrlCultureProvider supports en but <b>not</b> en-US.

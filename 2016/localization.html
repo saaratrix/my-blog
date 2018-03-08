@@ -66,7 +66,7 @@
 		<h2>
 			Similar Projects
 		</h2>
-		With these goals in mind I started looking around the web for solutions to implement. The solution closest to what I needed I found here: <a href="http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/">http://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/</a>&nbsp;. I did not like this for 2 reasons. <br />
+		With these goals in mind I started looking around the web for solutions to implement. The solution closest to what I needed I found here: <a href="https://www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/">www.strathweb.com/2015/11/localized-routes-with-asp-net-5-and-mvc-6/</a>&nbsp;. I did not like this for 2 reasons. <br />
 		1. His way of initializing the routes. Was not how I wanted to do it.
 		<br />
 		<pre class="prettyprint lang-cs linenums">
@@ -94,7 +94,7 @@
 		<br />
 		<pre class="prettyprint linenums">
 		<code>
-			[LocalizedRoute("fi", "miest‰")]
+			[LocalizedRoute("fi", "miest√§")]
 			[LocalizedRoute("sv", "om")]
 			public IActionResult About()
 			{
@@ -174,7 +174,7 @@
 		<h2>UrlCultureProvider.cs</h2>
 		This is the class added in the Request Localization section above. Asp.net on every request uses RequestProviders to set the culture.
 		The default ones that asp.net have are header, cookie and querystring provider.
-		You can read more about it <a href="http://www.jerriepelser.com/blog/how-aspnet5-determines-culture-info-for-localization" target="_blank">on this website</a>.
+		You can read more about it <a href="https://www.jerriepelser.com/blog/how-aspnet5-determines-culture-info-for-localization" target="_blank">on this website</a>.
 		I looked at the source code of asp.net localization to write my UrlCultureProvider. My implementetation <b>ONLY</b> supports 2 letters to figure out the culture.
 		So it does not for example support en-US but only en.
 		So this UrlCultureProvider supports en but <b>not</b> en-US.
@@ -556,7 +556,7 @@
 							newLocalizedActions.AttributeRouteModel.Template = attribute.Route;
 							newActions.Add(newLocalizedActions);
 							// Add the localized route for the action
-							// Example of final route:  "fi/koti" + "/" + "ota_yhteytt‰"
+							// Example of final route:  "fi/koti" + "/" + "ota_yhteytt√§"
 							LocalizationDataHandler.AddActionData(controllerName, actionName, attribute.Culture, attribute.Route, attribute.Link);
 						}
 					}
@@ -630,7 +630,7 @@
 				/// &lt;summary&gt;
 				/// All the routes and their cultural representation, example:
 				/// home =&gt; names { home, koti },  actions { index, about }
-				///     action about =&gt; names { about, miest‰ }
+				///     action about =&gt; names { about, miest√§ }
 				/// &lt;/summary&gt;
 				// Will never get modified after initialization is done.
 				private static ConcurrentDictionary&lt;string, CultureControllerData&gt; ControllerRoutes { get; } = new ConcurrentDictionary&lt;string, CultureControllerData&gt;();
@@ -820,15 +820,15 @@
 				{
 					return View();
 				}
-				[LocalizedRoute("fi", "miest‰")]
+				[LocalizedRoute("fi", "miest√§")]
 				[LocalizedRoute("sv", "om")]
 				public IActionResult About()
 				{
 					ViewData["Message"] = "Your application description page.";
 					return View();
 				}
-				// LocalizedRoute utomatically makes ota_yhteytt‰ => Ota Yhteytt‰
-				[LocalizedRoute("fi", "ota_yhteytt‰")]
+				// LocalizedRoute utomatically makes ota_yhteytt√§ => Ota Yhteytt√§
+				[LocalizedRoute("fi", "ota_yhteytt√§")]
 				// Explicitly tell the link text to be Kontakta Oss, url is kontakta-oss
 				[LocalizedRoute("sv", "kontakta-oss", "Kontakta Oss")]
 				public IActionResult Contact()
