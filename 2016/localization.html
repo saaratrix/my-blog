@@ -4,12 +4,12 @@
     <title></title>
 </head>
 <body>
-    This is one implementation of having localized routing in <strong>ASP.NET MVC Core 1.0 (asp.net 5 mvc 6 RC 1)</strong>
+    This is one implementation of having localized routing in <strong>ASP.NET Core MVC 1.0 (asp.net 5 mvc 6 RC 1)</strong>
 	<br />
-		Source code: <a href="https://github.com/haestflod/asp.net-mvc-core-1.0-localized-routing">asp.net-mvc-core-1.0-localized-routing</a>
+		Source code: <a href="https://github.com/haestflod/asp.net-core-mvc-localized-routing">asp.net-mvc-core-1.0-localized-routing</a>
 	<br />
 	<h3>
-		<b>NOTE: </b>A reader notified me of some breaking changes in newer ASP.NET Core versions so there is an updated blogpost here for version: <a href="/2017/12/localized-routing-aspnet-core-mvc-2.html">ASP.NET Core 2.1.2 MVC</a>
+		<b>NOTE: </b>A reader notified me of some breaking changes in newer ASP.NET Core versions so there is an updated blog post here for version: <a href="/2017/12/localized-routing-aspnet-core-mvc-2.html">ASP.NET Core 2.1 MVC</a>
 	</h3>
 	<br />
 	<div id="toc" class="hide"></div>
@@ -19,7 +19,7 @@
 		</h1>
 
 		</p>
-		A working localized routing example for  ASP.NET MVC Core 1.0 release candidate 1.
+		A working localized routing example for  ASP.NET Core MVC 1.0 release candidate 1.
 		The solution uses attributes on the controllers &amp; actions to determine the localized routing for each different culture.
 		A convention is added to the MvcOptions in startup.cs to iterate over all the controllers &amp; actions to set their routes based on the localized attributes.
 
@@ -94,7 +94,7 @@
 		<br />
 		<pre class="prettyprint linenums">
 		<code>
-			[LocalizedRoute("fi", "miestä")]
+			[LocalizedRoute("fi", "meistä")]
 			[LocalizedRoute("sv", "om")]
 			public IActionResult About()
 			{
@@ -630,7 +630,7 @@
 				/// &lt;summary&gt;
 				/// All the routes and their cultural representation, example:
 				/// home =&gt; names { home, koti },  actions { index, about }
-				///     action about =&gt; names { about, miestä }
+				///     action about =&gt; names { about, meistä }
 				/// &lt;/summary&gt;
 				// Will never get modified after initialization is done.
 				private static ConcurrentDictionary&lt;string, CultureControllerData&gt; ControllerRoutes { get; } = new ConcurrentDictionary&lt;string, CultureControllerData&gt;();
@@ -820,7 +820,7 @@
 				{
 					return View();
 				}
-				[LocalizedRoute("fi", "miestä")]
+				[LocalizedRoute("fi", "meistä")]
 				[LocalizedRoute("sv", "om")]
 				public IActionResult About()
 				{
