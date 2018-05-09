@@ -1,3 +1,22 @@
+(function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        var elementRoot = document.getElementById("contents");
+        if (!elementRoot) {
+            elementRoot = document.querySelector(".post-body");
+        }
+        // No codeblocks found!
+        if (!elementRoot) {
+            return;
+        }
+        var blocksList = elementRoot.querySelectorAll("pre.prettyprint");
+        var blocks = new Array(blocksList.length);
+        for (var i = 0; i < blocksList.length; i++) {
+            blocks[i] = blocksList[i];
+        }
+        var codeBlockToggler = new SaaratrixBlog.CodeBlockToggler();
+        codeBlockToggler.setupSnippetToggleForBlocks(blocks);
+    });
+})();
 var SaaratrixBlog;
 (function (SaaratrixBlog) {
     var CodeBlockToggler = /** @class */ (function () {
@@ -57,23 +76,4 @@ var SaaratrixBlog;
     }());
     SaaratrixBlog.CodeBlockToggler = CodeBlockToggler;
 })(SaaratrixBlog || (SaaratrixBlog = {}));
-(function () {
-    document.addEventListener("DOMContentLoaded", function () {
-        var elementRoot = document.getElementById("contents");
-        if (!elementRoot) {
-            elementRoot = document.querySelector(".post-body");
-        }
-        // No codeblocks found!
-        if (!elementRoot) {
-            return;
-        }
-        var blocksList = elementRoot.querySelectorAll("pre.prettyprint");
-        var blocks = new Array(blocksList.length);
-        for (var i = 0; i < blocksList.length; i++) {
-            blocks[i] = blocksList[i];
-        }
-        var codeBlockToggler = new SaaratrixBlog.CodeBlockToggler();
-        codeBlockToggler.setupSnippetToggleForBlocks(blocks);
-    });
-})();
 //# sourceMappingURL=blogcode.js.map

@@ -4,8 +4,8 @@
     <title></title>
 </head>
 <body>
-    This is one implementation of <strong>localized routing</strong> using <strong>ASP.NET Core 2 MVC</strong>.
-    [Attributes] are used to control the localization route data for the controllers and actions for simplicity.
+    This is one implementation of <strong>localized routes</strong> using <strong>ASP.NET Core 2 MVC</strong>.
+    [Attributes] are used to control the localized route data for the controllers and actions for simplicity.
     <br />
     Source code: <a href="https://github.com/haestflod/asp.net-core-mvc-localized-routing">https://github.com/haestflod/asp.net-core-mvc-localized-routing</a>
     <br />
@@ -24,7 +24,7 @@
         </p>
         <!--more-->
         <p>
-            Example for english (default), finnish and swedish culture.
+            Example using it for a controller for cultures english (default), finnish and swedish.
         </p>
 <pre class="prettyprint lang-cs linenums" data-start-visible="true">
 <code>
@@ -54,6 +54,26 @@
     }
 </code>
 </pre>
+        <p>
+            And example of using the CultureActionLinkTagHelper in the views for the anchor element.
+        </p>
+        <pre class="prettyprint lang-cs linenums" data-start-visible="true">
+<code>
+    // Generated html: &lt;a href="/Home/About"&gt;Home&lt;/a&gt;
+    &lt;a asp-controller="home" asp-action="about" cms-culture="en"&gt;Home&lt;/a&gt;
+
+    // Generated html: &lt;a href="/fi/koti/meistä"&gt;Meistä&lt;/a&gt;
+    &lt;a asp-controller="home" asp-action="about" cms-culture="fi"&gt;Home&lt;/a&gt;
+
+    // Generated html: &lt;a href="/sv/Hem/om"&gt;Hemma&lt;/a&gt;
+    &lt;a asp-controller="home" asp-action="about" cms-culture="sv"&gt;Home&lt;/a&gt;
+
+    // Leaving cms-culture="" empty will use the current request culture.
+    // If user is at /fi/... then finnish culture is used so the generated html would be:
+    // &lt;a href="/fi/koti/meistä"&gt;Meistä&lt;/a&gt;
+    &lt;a asp-controller="home" asp-action="about" cms-culture=""&gt;Home&lt;/a&gt;
+</code>
+        </pre>
         <h1>
             Introduction and features
         </h1>
