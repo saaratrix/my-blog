@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>    
+    <p>
+        Me, <a href="https://twitter.com/Roniatrix">Ronja</a> and <a href="https://twitter.com/dumbvilma">Vilma</a> worked together during the <a href="https://forums.unrealengine.com/unreal-engine/events/1458043-2018-spring-ue4jam-may-10-15">2018 Spring #ue4jam</a> and made a game.
+        The theme for the game jam this time was: <strong>Transformation</strong>.
+        Our game can be downloaded here on the itch.io page: <a href="https://saaratrix.itch.io/transforester">Transforester</a>
+        A full play through video can be found here: <a href="https://www.youtube.com/watch?v=TypANH5k9Lo">https://www.youtube.com/watch?v=TypANH5k9Lo</a>.
+        The game logic was implemented using only blueprint.
+        This post is about making the game from start to finish.
+	</p>
+    <!--more-->
+    <br>
+    <br>
+    <h2>May 10th (Day 1)</h2>
+    <p>
+        The game jam kicked off at 21.00 EEST and Epic Games announced the theme on their <a href="https://www.twitch.tv/unrealengine">stream</a>.
+        The theme was <strong>Transformation</strong> which is a very broad term and you can for example transform an objects position, rotation etc.
+        We brainstormed on what game idea to make and Ronja came up with an idea where you could either make plants happy or sad.
+        The concept at this point was similar to our last game jam entry: <a href="https://saaratrix.blogspot.fi/2017/11/epic-megajam-2017.html">E For Hugs</a>
+    </p>
+    <p>
+        To transition between the happy and sad state morph targets or animations were used depending on the object.
+        The happy and sad states are basically a healed or broken state.
+        Vilma made many experimental flowers, flower, flower1, flower2, flower3, flower4 until we finally got the export/import settings for the morph target from Blender to Unreal Engine correctly.
+        <br>
+        <a href="https://3.bp.blogspot.com/-OUhku_NiLus/WvwSR3X4SMI/AAAAAAAAAIg/dwm7poAoADUEW00i4IdcilJsfzPRnlLzQCLcBGAs/s1600/happysadkukka.png" imageanchor="1" >
+            <img alt="Happy sad flower" border="0" src="https://3.bp.blogspot.com/-OUhku_NiLus/WvwSR3X4SMI/AAAAAAAAAIg/dwm7poAoADUEW00i4IdcilJsfzPRnlLzQCLcBGAs/s200/happysadkukka.png" width="200" height="112" data-original-width="1361" data-original-height="762" />
+        </a>
+    </p>
+    <p>
+        I told a friend called Sophie about the game idea and she wrote lore for our game because she said a game needs lore.
+        We modified Sophie's lore once we knew how the game would be.
+        This is the lore for our game:
+    </p>
+    <blockquote>
+        <p>
+            You are Lili a 16 year old bucketeer from the village Greenage, in the country of Evergreen.
+            The village is famous for its nearby magical spirit forest.
+            Nobody has ever seen such a natural and beautiful forest.
+            What nobody knows is that in the forest lives a very old spirit who has been nourishing the forest for centuries.
+            Something has happened and the spirit has gone mad and the forest is suffering as a consequence.
+            So it's up to YOU to equip your magical bucket and save the forest from impending doom.
+        </p>
+    </blockquote>
+    <h2>May 11th (Day 2)</h2>
+    <p>
+        I copied over the <a href="https://forums.unrealengine.com/unreal-engine/announcements-and-releases/asset-sharing/1417286-game-jam-toolkit">UE4 Game Jam Toolkit</a> which added main menu & pause code and other assets.
+        <br>
+        <a href="https://2.bp.blogspot.com/-Ho0qztPdlJ4/WvwSShhf8VI/AAAAAAAAAIw/GuPWulbtj8gMoutmI3_czShKp8qauL0MACLcBGAs/s1600/mainmenu-ue4-gamejamtoolkit.png" imageanchor="1" >
+            <img alt="main menu ue4 game jam toolkit" border="0" src="https://2.bp.blogspot.com/-Ho0qztPdlJ4/WvwSShhf8VI/AAAAAAAAAIw/GuPWulbtj8gMoutmI3_czShKp8qauL0MACLcBGAs/s200/mainmenu-ue4-gamejamtoolkit.png" width="200" height="112" data-original-width="864" data-original-height="485" />
+        </a>
+    </p>
+    <p>
+        After that I added blueprint code to change the morph target between happy and sad state.
+        I also did performance testing which didn't look promising so we were going to have some performance issues if we filled the world with these flowers.
+        Each flower is a skeletal mesh and I don't know of a way to utilize batch rendering for skeletal meshes.
+        <br>
+        <a href="https://2.bp.blogspot.com/--haMHbALskk/WvwSTJSW7gI/AAAAAAAAAI4/tUe77B3_3YU2z0SkWCVOzRUuiGVvr_oywCLcBGAs/s1600/performance-testing.png" imageanchor="1" >
+            <img alt="performance testing" border="0" src="https://2.bp.blogspot.com/--haMHbALskk/WvwSTJSW7gI/AAAAAAAAAI4/tUe77B3_3YU2z0SkWCVOzRUuiGVvr_oywCLcBGAs/s200/performance-testing.png" width="200" height="108" data-original-width="1600" data-original-height="867" />
+        </a>
+        <br>
+        The performance was at 90 FPS looking away from everything and then when starting the transition from happy to sad for 480 flowers caused the FPS to drop from 90 to 60.
+    </p>
+    <p>
+        Ronja experimented using <a href="https://megascans.se/library/">Quixel Megascans</a> to see if we could have some really good looking flowers.
+    </p>
+    <h2>May 12th (Day 3)</h2>
+    <p>
+        I refined the happy/sad logic and created a projectile that makes everything in an area happy.
+        The sad projectile would be added later on day 4.
+        Ronja also made me a bucket that the projectile would come out of.
+        I don't know why but it seemed like a fun silly idea at the time as a placeholder but it stuck until the end.
+        Which is why Lili is a <strong>"bucketeer"</strong>.
+        <br>
+        <a href="https://2.bp.blogspot.com/-xRdHtoaBzUY/WvwSR-5lHMI/AAAAAAAAAIo/enscAXw0D787TGHCY8FIlY2EPMGRnlKwgCLcBGAs/s1600/first-projectile.png" imageanchor="1" >
+            <img alt="first projectile" border="0" src="https://2.bp.blogspot.com/-xRdHtoaBzUY/WvwSR-5lHMI/AAAAAAAAAIo/enscAXw0D787TGHCY8FIlY2EPMGRnlKwgCLcBGAs/s200/first-projectile.png" width="200" height="122" data-original-width="634" data-original-height="387" />
+        </a>
+    </p>
+    <p>
+        We weren't sure on what kind of game play or game mechanics we wanted so I decided to play more with particle effects.
+        I haven't done many particle effects and I'm still not at a level where I can create them from scratch or without a template/guide.
+        <br>
+        The particle effects that I implemented was based off the particle effects from the UE Game Jam Toolkit.
+        <br>
+        The cloud shock wave effect was done following this guide: <a href="https://www.youtube.com/watch?v=apPH38f7eoo">https://www.youtube.com/watch?v=apPH38f7eoo</a>
+        <br>
+        <a href="https://4.bp.blogspot.com/-Y00YEjjkTSA/WvwSTEFxytI/AAAAAAAAAI8/yPEG09iW2nkx6Kc6e8EsoOz5c96-hl-1ACLcBGAs/s1600/projectile-ring-first.png" imageanchor="1" >
+            <img alt="projectile ring first test" border="0" src="https://4.bp.blogspot.com/-Y00YEjjkTSA/WvwSTEFxytI/AAAAAAAAAI8/yPEG09iW2nkx6Kc6e8EsoOz5c96-hl-1ACLcBGAs/s200/projectile-ring-first.png" width="200" height="131" data-original-width="490" data-original-height="322" />
+        </a>
+        <br>
+        Here's the finished particle effect for both types of projectile:
+        <br>
+        <a href="https://media.giphy.com/media/jlcECqtiLJUu5vUGuH/giphy.gif" imageanchor="1" >
+            <img alt="Projectile showcase" border="0" src="https://media.giphy.com/media/jlcECqtiLJUu5vUGuH/giphy.gif" width="200" height="150" data-original-width="480" data-original-height="360" />
+        </a>
+    </p>
+    <p>
+        Vilma made the mushroom used in the levels and Ronja added the morph targets for the mushroom's sad state.
+        Ronja made a staircase out of the mushrooms that you had to activate by making the mushrooms happy.
+        <br>
+        <a href="https://2.bp.blogspot.com/-ReymiotecZ8/Wvwb-zXhpHI/AAAAAAAAAJo/zvrJvlP5X88cFzWQK2fTePT8AVT2RX0AwCLcBGAs/s1600/inactive-mushrooms-stairs.png" imageanchor="1" >
+            <img alt="inactive mushroom staircase" border="0" src="https://2.bp.blogspot.com/-ReymiotecZ8/Wvwb-zXhpHI/AAAAAAAAAJo/zvrJvlP5X88cFzWQK2fTePT8AVT2RX0AwCLcBGAs/s200/inactive-mushrooms-stairs.png" width="200" height="96" data-original-width="684" data-original-height="327" />
+        </a>
+        <br>
+        <a href="https://1.bp.blogspot.com/-btJxI7Cut-k/Wvwb-7VRuOI/AAAAAAAAAJk/AEDvkq7L0Vcg7iwvfuOuy-BddFUHIaDDwCLcBGAs/s1600/mushroom-stairs.png" imageanchor="1" >
+            <img alt="active mushroom staircase" border="0" src="https://1.bp.blogspot.com/-btJxI7Cut-k/Wvwb-7VRuOI/AAAAAAAAAJk/AEDvkq7L0Vcg7iwvfuOuy-BddFUHIaDDwCLcBGAs/s200/mushroom-stairs.png" width="200" height="95" data-original-width="742" data-original-height="354" />
+        </a>
+    </p>
+    <h2>May 13th (Day 4)</h2>
+    <p>
+        I continued working on the projectile particle effect focusing on the projectile itself and the trail effect as the projectile flies to its destination.
+        I also added the sad red bullet.
+        One bug that I noticed when both projectiles were implemented was that they could collide with each others if you shot both at the same time.
+        But I left that in there because it was fun to do!
+        <br>
+        <a href="https://4.bp.blogspot.com/-c9WksFL-xtc/WvwSS7gzwBI/AAAAAAAAAI0/D1ilp4laTKw4VffgjjBi6BfWS1lN1GLewCLcBGAs/s1600/particles-colliding.png" imageanchor="1" >
+            <img alt="particles colliding" border="0" src="https://4.bp.blogspot.com/-c9WksFL-xtc/WvwSS7gzwBI/AAAAAAAAAI0/D1ilp4laTKw4VffgjjBi6BfWS1lN1GLewCLcBGAs/s200/particles-colliding.png" width="200" height="105" data-original-width="1066" data-original-height="557" />
+        </a>
+    </p>
+    <p>
+        After I was done with both projectiles I decided to build the project and ship it to make sure everything works.
+        I noticed the projectiles weren't working properly because I used an Arrow Component to get the spawn transform for the projectiles.
+        I learned that an Arrow Component's GetWorldTransform node returns location at 0, 0, 0 so the projectile was automatically colliding at 0, 0, 0 in the level.
+        I replaced the arrow component with a target point and everything worked.
+        The x-axis for the target point served as the visual cue how the projectile would be launched out of the bucket instead of the arrow from an arrow component.
+        <br>
+        This is why it's good to ship early to catch errors such as these!
+    </p>
+    <h2>May 14th ( Day 5 )</h2>
+    <p>
+        We're getting closer to deadline at this point!!
+        I added the spirit and effects for the spirit depending if you hit it with happy or sad projectiles.
+        I also added a win condition if you purified the spirit by hitting it 3 times with one type of projectile.
+        <br>
+        <a href="https://2.bp.blogspot.com/-2KdY0N4lWN4/WvwSTWCZiEI/AAAAAAAAAJA/NeU05lRRCacelTeIkAeNYoNpXC0QuCC9wCLcBGAs/s1600/spirit-states.png" imageanchor="1" >
+            <img alt="spirit states" border="0" src="https://2.bp.blogspot.com/-2KdY0N4lWN4/WvwSTWCZiEI/AAAAAAAAAJA/NeU05lRRCacelTeIkAeNYoNpXC0QuCC9wCLcBGAs/s200/spirit-states.png" width="200" height="48" data-original-width="1600" data-original-height="381" />
+        </a>
+    </p>
+    <p>
+        Ronja made a pillar and a tree.
+        The pillar used animations instead of morph targets or it'd not break properly so I refactored the code to support both animations and morph targets.
+        <br>
+        <a href="https://2.bp.blogspot.com/-T6tVDGi99Y8/WvwSR5A_3DI/AAAAAAAAAIk/eKnIHqjTpe8YEBn-vdipeyHsIOCuRMmkgCLcBGAs/s1600/broken-pillar.png" imageanchor="1" >
+            <img alt="broken pillar" border="0" src="https://2.bp.blogspot.com/-T6tVDGi99Y8/WvwSR5A_3DI/AAAAAAAAAIk/eKnIHqjTpe8YEBn-vdipeyHsIOCuRMmkgCLcBGAs/s200/broken-pillar.png" width="200" height="93" data-original-width="788" data-original-height="366" />
+        </a>
+    </p>
+    <h2>May 15th ( Day 6 - Final )</h2>
+    <p>
+        At this point we only had assets and no real game.
+        So this gif sums up our reaction:
+        <br>
+        <a href="https://media.giphy.com/media/lNMyVfxjfzIJO/giphy.gif" imageanchor="1">
+            <img alt="Freakout gif" border="0" src="https://media.giphy.com/media/lNMyVfxjfzIJO/giphy.gif" width="320" height="180" data-original-width="310" data-original-height="174" />
+        </a>
+    </p>
+    <p>
+        Ronja started on making the actual levels which can all be seen in the play through youtube video: <a href="https://www.youtube.com/watch?v=TypANH5k9Lo">https://www.youtube.com/watch?v=TypANH5k9Lo</a>.
+        To jump between levels we needed an item to transition the player.
+        So that is what I worked on next, making an object that changes the level.
+        <br>
+        <a href="https://3.bp.blogspot.com/-FWGRK_Fx-Z8/WvwSSS1FQRI/AAAAAAAAAIs/mv6_LDxXrCUqKo_lcE1UkRNUIt9tFAx7wCLcBGAs/s1600/level-platform.png" imageanchor="1" >
+            <img alt="level change platform" border="0" src="https://3.bp.blogspot.com/-FWGRK_Fx-Z8/WvwSSS1FQRI/AAAAAAAAAIs/mv6_LDxXrCUqKo_lcE1UkRNUIt9tFAx7wCLcBGAs/s200/level-platform.png" width="200" height="123" data-original-width="377" data-original-height="232" />
+        </a>
+    </p>
+    <p>
+        I also added the win screen which depends on how you purified the spirit and sound effects to the game.
+        <br>
+        <a href="https://1.bp.blogspot.com/-2y1nrZXEkpE/WvwST6bnZ4I/AAAAAAAAAJE/qsKWFVjlfQcv6_loFu_8P0MCNXN3CgxiACLcBGAs/s1600/winscreens.png" imageanchor="1" >
+            <img alt="win screens" border="0" src="https://1.bp.blogspot.com/-2y1nrZXEkpE/WvwST6bnZ4I/AAAAAAAAAJE/qsKWFVjlfQcv6_loFu_8P0MCNXN3CgxiACLcBGAs/s200/winscreens.png" width="200" height="18" data-original-width="1600" data-original-height="146" />
+        </a>
+    </p>
+    <p>
+        Vilma made the rocks used throughout each level and especially during the last 2.
+    </p>
+    <p>
+        We built the final version 1 hour before the deadline and spent the next 40 minutes making the game play footage.
+        Then we saw on the itch.io page a video between 30-60 seconds and ours was 93 seconds long so we paniced not knowing we could edit the post or not!
+        So the first 2 videos uploaded for itch.io were horrible quality with an audible sound artifact when changing a level.
+    </p>
+    <h2>Afterword</h2>
+    <p>
+        It was fun to take part in a game jam again.
+        I have barely touched Unreal Engine since the epic mega jam and it was really fun to use the engine again.
+        I am surprised how well the game turned out because at the start of the final day all we had was a bucket that shoots projectiles and 4 terrain assets.
+        So Ronja did a really good job making the levels!
+    </p>
+</body>
+</html>
