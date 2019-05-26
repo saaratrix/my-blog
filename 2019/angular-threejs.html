@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <p>
+        I used <a href="https://angular.io">Angular 7</a> with <a href="https://threejs.org/">three.js</a> to make a simple 3D viewer.
+        The goal was to write a generic Angular component loading three.js that can easily be used by any project and then apply the application logic afterwards.
+	</p>
+    <!--more-->
+    <div id="toc" class="hide"></div>
+    <div id="contents">
+        <p>
+            The project's source code can be found here: <a href="https://github.com/haestflod/generic-3Dproduct-viewer">github.com/haestflod/generic-3Dproduct-viewer</a>
+            <br>
+            The generic Angular component can be found here: <a href="https://github.com/haestflod/generic-3Dproduct-viewer/tree/master/src/app/viewer-threejs">github.com/haestflod/generic-3Dproduct-viewer/tree/master/src/app/viewer-threejs</a>
+            <br>
+            The application can be demoed here: <a href="https://haestflod.github.io/generic-3Dproduct-viewer/build/">haestflod.github.io/generic-3Dproduct-viewer/build/</a>
+        </p>
+        <h1>How it works</h1>
+		<p>
+            The app component's HTML code:
+        </p>
+            <pre class="prettyprint lang-html linenums">
+<code>
+&lt;div class="container-3D"&gt;
+  &lt;app-viewer-threejs (sceneInit)="onSceneInit($event)" &gt;&lt;/app-viewer-threejs&gt;
+  &lt;app-toolbar&gt;&lt;/app-toolbar&gt;
+  &lt;app-loading-spinner *ngIf="loadingsStarted !== loadingsFinished"&gt;&lt;/app-loading-spinner&gt;
+&lt;/div&gt;
+</code>
+            </pre>
+        <p>
+            <code>&lt;app-viewer-threejs&gt;</code> is the generic Angular component.
+            The component has an input event called sceneInit which dispatches when the WebGLRenderer has been created.
+            In the app component's onSceneInit() the class ProductConfigurator is created which does all the 3D logic.
+            Such as set up the camera, the scene with lights etc.
+        </p>
+        <p>
+            The app is structured so there are 2 different parts, Angular components for the view and 3D logic for the 3D.
+            I wanted the three.js component to only set up the WebGLRenderer so there's no logic in that component itself.
+		</p>
+        <h2>Sharing data</h2>
+        <p>
+            The service <strong>ProductConfiguratorService</strong> is used to share data between classes and components.
+            In the service I use Subject to handle events that can happen in the application.
+            <br>
+            For example a user clicks a button to change a 3D model.
+            The action dispatches an event <strong>ChangeProduct</strong> which all subscriptions can handle how they seem fit.
+        </p>
+        <h1>Afterwords</h1>
+        <p>
+            This is one way of using Angular and three.js.
+            This worked well for my goals and it's a small application so I can't say if it scales to a massive code base.
+            But for now it's easy to create new events and handle them.
+        </p>
+    </div>
+</body>
+</html>
