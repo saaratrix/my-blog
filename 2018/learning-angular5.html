@@ -21,13 +21,13 @@
             But now I wanted to update the app and at the same time learn Angular 5!
 		</p>
         <p>
-            The app's source code can be found here: <a href="https://github.com/haestflod/glossarytraining">github.com/haestflod/glossarytraining</a>.
+            The app's source code can be found here: <a href="https://github.com/saaratrix/glossarytraining">github.com/saaratrix/glossarytraining</a>.
             It uses many of the basic features of Angular such as components, modules, routes and child routes.
             Here's a nice cheat sheet for features in Angular: <a href="https://angular.io/guide/cheatsheet">angular.io/guide/cheatsheet</a>.
             I'm using Less for CSS and the backend is written using <a href="https://expressjs.com/">Express</a> to handle communicating with the MySQL database.
         </p>
         <p>
-            The app can be tested here: <a href="https://haestflod.github.io/glossarytraining/dist/">haestflod.github.io/glossarytraining/dist/</a>
+            The app can be tested here: <a href="https://saaratrix.github.io/glossarytraining/dist/">saaratrix.github.io/glossarytraining/dist/</a>
         </p>
 
         <h1>Learning Angular</h1>
@@ -81,7 +81,7 @@ ng new my-app --style=less
         <h3>Add modules of what is used to the *.module.ts file</h3>
         <p>
             This one is intuitive when you've learned the basics of Angular but as I started I got errors about using <strong>HttpClient</strong>.
-            Which was solved by adding the <strong>HttpClientModule</strong> to the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/shared/shared.module.ts">/shared/shared.module.ts</a> file.
+            Which was solved by adding the <strong>HttpClientModule</strong> to the <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/shared/shared.module.ts">/shared/shared.module.ts</a> file.
         </p>
         <p>
             The module needs to be added to the <strong>*.module.ts</strong> file that does the declaration for the component using the model.
@@ -97,33 +97,33 @@ ng new my-app --style=less
             Otherwise it throws an error about the <strong>@Input()</strong> parameters.
         </p>
         <p>
-            Example is my <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/home/home.component.html">home component</a> wants to use the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/quiz/quiz-selection/quiz-selection.component.ts">quiz selection component</a>.
+            Example is my <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/home/home.component.html">home component</a> wants to use the <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/quiz/quiz-selection/quiz-selection.component.ts">quiz selection component</a>.
             <br />
-            Then the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/quiz/quiz.module.ts">quiz module</a> needs to export the <strong>quiz selection component</strong>.
+            Then the <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/quiz/quiz.module.ts">quiz module</a> needs to export the <strong>quiz selection component</strong>.
             <br />
-            And the <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/home/home.module.ts">home module</a> needs to import the <strong>quiz module</strong>.
+            And the <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/home/home.module.ts">home module</a> needs to import the <strong>quiz module</strong>.
         </p>
 
         <h3>Creating services</h3>
         <p>
             When you're creating a service the service needs to be added to the providers array of the module exporting the service.
-            Example here: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/shared/shared.module.ts">shared module.</a>
+            Example here: <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/shared/shared.module.ts">shared module.</a>
         </p>
 
         <h3>Detect changes in array</h3>
         <p>
             When passing an array to a component and the array is changed outside the component with for example <code>array.push()</code> then the component doesn't know that the array has changed without adding an <strong>IterableDiffers</strong>.
             <br />
-            Example of IterableDiffers being used: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/phrase/phrases-selection/phrases-selection.component.ts">phrases selection component.</a>
+            Example of IterableDiffers being used: <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/phrase/phrases-selection/phrases-selection.component.ts">phrases selection component.</a>
             <br />
-            The component is being used here: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/admin/phrases/phrases-quiz-selection/phrases-quiz-selection.component.html">phrases quiz selection component.</a>
+            The component is being used here: <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/admin/phrases/phrases-quiz-selection/phrases-quiz-selection.component.html">phrases quiz selection component.</a>
         </p>
 
         <h3>Getting HTML element in component</h3>
         <p>
             You can get a reference to a HTML element by using <code>@ViewChild("id") element: ElementRef</code> for <code>&lt;div #id&gt;&lt/div&gt;</code>
             <br />
-            Example of <code>@ViewChild("questionInput")</code> being used: <a href="https://github.com/haestflod/glossarytraining/blob/master/src/app/quiz/quiz-text-question/quiz-text-question.component.ts">quiz text question component.</a>
+            Example of <code>@ViewChild("questionInput")</code> being used: <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/app/quiz/quiz-text-question/quiz-text-question.component.ts">quiz text question component.</a>
             <br />
             The element that's referenced in the example looks like this: <code>&lt;input #questionInput &gt;</code>
         </p>
@@ -159,7 +159,7 @@ ng new my-app --style=less
             CanJS is another framework that uses reusable components to create a web app.
             So encapsulating was a habit to make sure the CSS is properly scoped.
             This however is not how it works in Angular because it does it for you automatically.
-            As a workaround until properly fixed I had to import each component's style file into the global <a href="https://github.com/haestflod/glossarytraining/blob/master/src/styles.less">styles.less</a> file.
+            As a workaround until properly fixed I had to import each component's style file into the global <a href="https://github.com/saaratrix/glossarytraining/blob/master/src/styles.less">styles.less</a> file.
         </p>
         <p>
             Here's an example of what I did wrong when I encapsulated the CSS for the <strong>&lt;app-admin&gt;</strong> component.
@@ -194,14 +194,14 @@ nav {
             The Express app is based off the template here: <a href="https://github.com/designcourse/mean4plus">github.com/designcourse/mean4plus.</a>
             Which was to make sure it worked with Angular.
             <br />
-            The API routes entry point is in the file <a href="https://github.com/haestflod/glossarytraining/blob/master/server/routes.ts">/server/routes.ts</a>
+            The API routes entry point is in the file <a href="https://github.com/saaratrix/glossarytraining/blob/master/server/routes.ts">/server/routes.ts</a>
             <br />
             The backend uses <a href="https://github.com/mysqljs/mysql">MySQL</a> npm package to communicate with the database.
-            I wrote a <a href="https://github.com/haestflod/glossarytraining/blob/master/server/database/mysql-connection.ts#L31">generic query function</a> to always return a promise to use for async/await.
+            I wrote a <a href="https://github.com/saaratrix/glossarytraining/blob/master/server/database/mysql-connection.ts#L31">generic query function</a> to always return a promise to use for async/await.
             <br />
-            The generic query is demonstrated in the <a href="https://github.com/haestflod/glossarytraining/blob/master/server/handlers/BaseHandler.ts#L20">/server/handlers/BaseHandler.ts</a>
+            The generic query is demonstrated in the <a href="https://github.com/saaratrix/glossarytraining/blob/master/server/handlers/BaseHandler.ts#L20">/server/handlers/BaseHandler.ts</a>
             <br />
-            The server also has its own tsconfig.json which is compiled before launching server using the <a href="https://github.com/haestflod/glossarytraining/blob/master/package.json#L12">start-server</a> script in package.json.
+            The server also has its own tsconfig.json which is compiled before launching server using the <a href="https://github.com/saaratrix/glossarytraining/blob/master/package.json#L12">start-server</a> script in package.json.
         </p>
 
         <h1>Conclusion</h1>

@@ -6,7 +6,7 @@
 <body>
     <p>
         This is about writing a .NET Core application to automatically convert GLSL into Babylon.js ShaderStore code.
-        The project is available on github <a href="https://github.com/haestflod/glsl-babylonshader">here</a>.
+        The project is available on github <a href="https://github.com/saaratrix/glsl-babylonshader">here</a>.
     </p>
     <!--more-->
     <div id="toc"></div>
@@ -240,7 +240,7 @@ using (FileStream fs = new FileStream("file.txt", FileMode.Open))
             And Microsoft had ported MS Unit Tests to .NET Core by then so I could use that instead of a 3rd party.
         </p>
         <p>
-            I like using Moq for unit tests but at the time Moq wasn't ported to .NET Core so I had to go the old fashioned way and create a <a href="https://github.com/haestflod/glsl-babylonshader/blob/master/src/tests/testhelpers/Interfaces/MockConverter.cs">MockInterface</a> myself to properly unit test.
+            I like using Moq for unit tests but at the time Moq wasn't ported to .NET Core so I had to go the old fashioned way and create a <a href="https://github.com/saaratrix/glsl-babylonshader/blob/master/src/tests/testhelpers/Interfaces/MockConverter.cs">MockInterface</a> myself to properly unit test.
             Moq might be ported to .NET Core now based off this post:
             <a href="https://stackoverflow.com/questions/40127329/how-to-add-moq-as-a-dependency-in-dotnet-core">stackoverflow.com/questions/40127329/how-to-add-moq-as-a-dependency-in-dotnet-core</a>
         </p>
@@ -251,7 +251,7 @@ using (FileStream fs = new FileStream("file.txt", FileMode.Open))
             <code>dotnet glsl-babylon.dll</code>
         </p>
         <p>
-            Now when you build the application in <b><a href="https://github.com/haestflod/glsl-babylonshader/blob/master/src/glsl-babylon/project.json">project.json</a></b>
+            Now when you build the application in <b><a href="https://github.com/saaratrix/glsl-babylonshader/blob/master/src/glsl-babylon/project.json">project.json</a></b>
             the run times property will create an .exe file on windows and on linux and osx it will generate similar binaries.
         </p>
         <h1>Improvements to the application</h1>
