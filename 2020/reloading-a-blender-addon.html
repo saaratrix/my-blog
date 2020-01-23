@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <p>
+        I started working on my first Blender add-on for 2.80 and quickly wondered: <strong>how do I reload my blender add-on without restarting Blender!?</strong>
+        After spending roughly a day researching on how to reload I was able to just hit a key (F8) inside Blender to reload the add-on.
+    </p>
+    <p>
+        After searching and testing on different approaches for reloading I came across this post:
+        <a href="https://developer.blender.org/T67387">https://developer.blender.org/T67387</a> .
+        I had gone through many of their steps in trying to figure out how to reload the add-ons :).
+    </p>
+    <h1>The solution:</h1>
+    <p>
+        Two steps are required to easily reload the add-on.
+        <br>
+        One is setting up the reload key binding because reload scripts action is unbound.
+        <br>
+        The other one is writing the proper reload code in the <code>__init__.py</code> file.
+    </p>
+    <!--more-->
+    <h2>Reload keybinding (F8)</h2>
+    <p>
+        Adding the new key binding wasn't very intuitive but these are the steps to add the script.reload keybinding:
+        <code>Edit -> Preferences -> Keymap -> Expand Screen -> Expand Screen (Global) -> Add New -> Expand the new action (none) -> set action as "script.reload" -> set key binding. -> You're done!!</code>
+        I set the binding to F8 because that's what many other solutions for 2.79 etc mentioned.
+        <br>
+        <a href="https://4.bp.blogspot.com/-J3vJ_c-r6SU/XiS92rvr8AI/AAAAAAAAARw/1RZPxELCOTA_waGkJR6Reg9aQnv98HNPQCLcBGAsYHQ/s1600/reload-scripts.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-J3vJ_c-r6SU/XiS92rvr8AI/AAAAAAAAARw/1RZPxELCOTA_waGkJR6Reg9aQnv98HNPQCLcBGAsYHQ/s320/reload-scripts.png" width="320" height="204" data-original-width="1561" data-original-height="993" /></a>
+        <br>
+        <a href="https://2.bp.blogspot.com/-iCCkjlocikQ/XiS-TwJJgqI/AAAAAAAAASA/4XltYuxXKUsoTT3ZhD81XYtUbmqH0B4ogCLcBGAsYHQ/s1600/reload-scripts_2.png" imageanchor="1" ><img border="0" src="https://2.bp.blogspot.com/-iCCkjlocikQ/XiS-TwJJgqI/AAAAAAAAASA/4XltYuxXKUsoTT3ZhD81XYtUbmqH0B4ogCLcBGAsYHQ/s320/reload-scripts_2.png" width="320" height="206" data-original-width="1575" data-original-height="1014" /></a>
+    </p>
+    <h2>__init__.py</h2>
+    <p>
+        This was the difficult part because many of the things I tried like just using <code>importlib</code> to reload the modules didn't work.
+        But that post from blender forums did something I hadn't seen before in any other post.
+        It used an if statement if bpy existed in locals.
+        Here is how the code looked like for my test add-on when I solved the reload problem:
+    </p>
+<pre>
+<code class="prettyprint lang-python linenums" data-start-visible="true">
+# Check if this add-on is being reloaded
+if "bpy" in locals():
+    # reloading .py files
+    import importlib
+
+    from . import nuu_menu_panel
+    importlib.reload(nuu_menu_panel)
+    from . import nuu_menu_open_op
+    importlib.reload(nuu_menu_open_op)
+# or if this is the first load of this add-on
+else:
+    import bpy
+    from . import nuu_menu_panel
+    from . import nuu_menu_open_op
+
+bl_info = {
+    "name": "Nuu Test",
+    "author": "Luna",
+    "version": (0, 0, 1),
+    "blender": (2, 80, 0),
+    "category": "Generic",
+    "location": "View3D",
+}
+
+classes = (nuu_menu_panel.NUU_PT_menuPanel, nuu_menu_open_op.NUU_OT_menuOpenOperator)
+
+register, unregister = bpy.utils.register_classes_factory(classes)
+
+# This allows you to run the script directly from Blender's Text editor
+# to test the add-on without having to install it.
+if __name__ == "__main__":
+    register()
+</code>
+</pre>
+    <p>
+        After doing these two things you should be able to just reload the add-on with the click of a button.
+    </p>
+</body>
+</html>

@@ -3,7 +3,6 @@ module SaaratrixBlog {
         public setupSnippetToggleForBlocks (blocks: HTMLElement[]) {
             for (let i = 0; i < blocks.length; i++) {
                 let block = blocks[i];
-
                 this.setupSnippetToggleForBlock( block );
             }
         }
@@ -53,7 +52,6 @@ module SaaratrixBlog {
             button.innerHTML = "Show code - " + lines + " lines";
             button.style.marginBottom = "5px";
             block.style.display = "none";
-
         }
 
         private showCode (block: HTMLElement, button: HTMLButtonElement) {
