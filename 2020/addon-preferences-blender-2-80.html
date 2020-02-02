@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<p>
+    When trying to implement user preferences for a 2.80 Blender add-on the official documentation was confusing for me and it didn't work with their example code.
+    Their comment on what to set <code>bl_idname</code> as was the confusing part.
+    Probably because of my Python inexperience.
+    <br>
+    <a href="https://docs.blender.org/api/current/bpy.types.AddonPreferences.html">https://docs.blender.org/api/current/bpy.types.AddonPreferences.html</a>
+</p>
+<p>
+    After some searching I found this article that helped me understand what I had done wrong and make it work.
+    <br>
+    <a href="https://b3d.interplanety.org/en/add-on-preferences-panel/">https://b3d.interplanety.org/en/add-on-preferences-panel/</a>
+</p>
+<h1>Example code with preferences in own file</h1>
+<p>
+    The code to get add-on preferences in Blender 2.80 in its own file was this code below.
+    <code>bl_idname</code> should be <code>__name__</code> if the class is inside <code>__init__.py</code> otherwise <code>__package__</code>.
+</p>
+<pre>
+<code class="prettyprint lang-python linenums" data-start-visible="true">
+import bpy
+
+
+class EXAMPLE_addonPreferences(bpy.types.AddonPreferences):
+    bl_idname = __package__
+
+    # Code below copied from https://b3d.interplanety.org/en/add-on-preferences-panel/
+    add_bevel: bpy.props.EnumProperty(
+        items=[
+            ('bevel', 'Add bevel', '', '', 0),
+            ('no_bevel', 'No bevel', '', '', 1)
+        ],
+        default='no_bevel'
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text='Add bevel modifier:')
+        row = layout.row()
+        row.prop(self, 'add_bevel', expand=True)
+
+</code>
+</pre>
+<p>
+    Here is an image of the add-on preferences UI from the code above.
+    <br>
+    <a href="https://1.bp.blogspot.com/-cAb8m2Olp_c/Xjb9U2mp7MI/AAAAAAAAASM/qg7G0Nml2RgLkLzZV1qN4HUNMcnZT3NCwCLcBGAsYHQ/s1600/addon-preference-example.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-cAb8m2Olp_c/Xjb9U2mp7MI/AAAAAAAAASM/qg7G0Nml2RgLkLzZV1qN4HUNMcnZT3NCwCLcBGAsYHQ/s320/addon-preference-example.png" width="320" height="269" data-original-width="655" data-original-height="551" /></a>
+</p>
+<!--more-->
+<h1>How to use</h1>
+<p>
+    To get the add-on preferences I used this code:
+</p>
+<pre>
+<code class="prettyprint lang-python linenums" data-start-visible="true">
+    # This part has changed from 2.79 -> 2.80, it used to be context.user_preference
+    preferences = context.preferences
+    # Use __name__ instead if inside the __init__.py file.
+    addon_prefs = preferences.addons[__package__].preferences
+    add_bevel = addon_prefs.add_bevel
+
+</code>
+</pre>
+<p>
+    The blender api change log can be found here:
+    <br>
+    <a href="https://docs.blender.org/api/current/change_log.html">https://docs.blender.org/api/current/change_log.html</a>
+</p>
+</body>
+</html>
