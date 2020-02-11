@@ -7,35 +7,105 @@
     <div id="toc" class="hide"></div>
     <div id="contents">
         <p>
-            I have decided to try and make a blender add-on to create a feature that a friend came up with.
-            She thought it would be a nice addition and I agreed.
-            I learned quickly that there isn't much documentation about creating Blender add-ons.
-            I'm using PyCharm for developing the add-on.
-	    </p>
+            I decided to try Python out and make a Blender add-on to create a feature that a friend came up with.
+            I learned quickly that there isn't much documentation about creating Blender Add-ons.
+            This guide will be about how to set up a Blender Add-on project with PyCharm that works with source control (Git).
+        </p>
         <!--more-->
         <h1>Setting up project</h1>
         <p>
-            Setting up normal pycharm project.
-        </p>
-        <h2>My folder structure</h2>
-        <h2>Getting bpy module for auto-complete</h2>
-        <p>
-            Lorem ipsum bla blo bla.
-        </p>
-        <h2>Reloading project files</h2>
-        <p>
-            The default behaviour for Blender seems to only reload the <strong>__init.py</strong> file and not the sub modules or classes.
-            Which means I had to restart Blender every time I made a code change which isn't very optimal.
-            I spent 5+ hours trying to figure out how to make the other classes also reload.
+            Step one is to create a pure Python project in PyCharm in a source control repository.
+            <br>
+            <code>File -> New Project -> Pure Python</code>
+            <br>
+            <!-- image -->
         </p>
         <p>
-            How to reload -- Lorem ipsum dalaran.
+            Second step is to create a new folder inside the project that is the Blender Add-on package.
+            This is the folder where all your files for the add-on will go.
+            All non add-on related files you can place outside this folder.
         </p>
-
-        <pre class="prettyprint lang-js linenums">
+        <p>
+            Then add a <strong>__init__.py</strong> file which is the entry point of your add-on.
+            The initial code in the file can look like this:
+        </p>
+<pre>
 <code>
+    import bpy
+
+
+    bl_info = {
+        "name": "Example Addon",
+        "author": "Luna",
+        "version": (0, 0, 1),
+        "blender": (2, 80, 0),
+        "category": "Generic",
+        "location": "View3D",
+    }
+
+    # Add your Blender classes here after importing them
+    classes = (Example.menu_open_op)
+    register, unregister = bpy.utils.register_classes_factory(classes)
+
+    # This allows you to run the script directly from Blender's Text editor
+    # to test the add-on without having to install it.
+    if __name__ == "__main__":
+        register()
 </code>
-        </pre>
+</pre>
+        <h1>Sym-linking folder to blender</h1>
+        <p>
+            Blender wants the add-on folder to be inside the blender add-on folder which on my computer is located at
+            <strong>C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons</strong> .
+            To create a symlink we need to use command prompt run as administrator.
+            Then run the following syntax:
+            <code>mklink /D Target Source</code> .
+            <br>
+            The mklink with actual paths:
+            <code>mklink /D "C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons\example-addon" "C:\Users\User\example-project\example-addon"</code>
+        </p>
+        <h1>Getting bpy module for auto-complete</h1>
+        <p>
+            From what I found there are few ways to generate types for blender such as generate them yourself.
+            But the only way that I managed to do was to download already generated typings for Blender.
+            I chose <strong>fake-bpy module</strong> that can be found at <a href="https://github.com/nutti/fake-bpy-module">https://github.com/nutti/fake-bpy-module</a>.
+            There are two ways to install fake-bpy-module.
+            One way is to use pip and add the <strong>fake-bpy-module-2.80</strong> package.
+            <br>
+            <!-- image -->
+        </p>
+        <p>
+            The other way is to download the package yourself and place it inside your project.
+            The packages can be downloaded here: <a href="https://github.com/nutti/fake-bpy-module/releases">https://github.com/nutti/fake-bpy-module/releases</a>
+            I placed the files inside a <strong>fake-bpy-module</strong> folder and then marked the directory as a source root.
+            <br>
+            <!-- image -->
+            <br>
+        </p>
+        <h1>You're finished!</h1>
+        <p>
+            That should be all the steps to set up your very first Blender add-on project.
+            Now you can add things like operators, panels etc so you can actually do something in Blender!
+            My project folder looked like this when finished:
+            <br>
+            <!-- image -->
+        </p>
+        <p>
+            To continue your first Blender add-on here is a link to the official tutorial:
+            <a href="https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html">https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html</a>
+        </p>
+        <h1>More reading</h1>
+        <p>
+            Other Blender related blog posts by me that may be of interest:
+        </p>
+        <ul>
+            <li>
+                <a href="/2020/01/easily-reloading-blender-addon.html">Reload modified 2.80 Blender Add-on</a>
+            </li>
+            <li>
+                <a href="/2020/01/easily-reloading-blender-addon.html">How to add user preferences for a Blender Add-on</a>
+            </li>
+        </ul>
     </div>
 </body>
 </html>
