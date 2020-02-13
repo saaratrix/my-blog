@@ -4,38 +4,41 @@
     <title></title>
 </head>
 <body>
-    <div id="toc" class="hide"></div>
-    <div id="contents">
-        <p>
-            I decided to try Python out and make a Blender add-on to create a feature that a friend came up with.
-            I learned quickly that there isn't much documentation about creating Blender Add-ons.
-            This guide will be about how to set up a Blender Add-on project with PyCharm that works with source control (Git).
-        </p>
-        <!--more-->
-        <h1>Setting up project</h1>
-        <p>
-            Step one is to create a pure Python project in PyCharm in a source control repository.
-            <br>
-            <code>File -> New Project -> Pure Python</code>
-            <br>
-            <a href="https://4.bp.blogspot.com/-6hEp8DhCZk4/XkRmWWOIQKI/AAAAAAAAASY/k0pNzkeZv5UXqJVc2wWzBZHEN0McXu-5wCLcBGAsYHQ/s1600/pycharm-new-project.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-6hEp8DhCZk4/XkRmWWOIQKI/AAAAAAAAASY/k0pNzkeZv5UXqJVc2wWzBZHEN0McXu-5wCLcBGAsYHQ/s320/pycharm-new-project.png" width="320" height="179" data-original-width="966" data-original-height="540" /></a>
-        </p>
-        <p>
-            Second step is to create a new folder inside the project that is the Blender Add-on package.
-            This is the folder where all your files for the add-on will go.
-            All non add-on related files you can place outside this folder.
-        </p>
-        <p>
-            Then add a <strong>__init__.py</strong> file which is the entry point of your add-on.
-            The initial code in the file can look like this:
-        </p>
-<pre>
+<p>
+    I decided to try out Python and make a Blender Add-on to create a feature that a friend came up with.
+    I learned quickly that there isn't much documentation on how to create Blender Add-ons.
+    This guide will be about how to set up a Blender Add-on project with PyCharm that works with source control.
+</p>
+<div id="toc" class="hide"></div>
+<div id="contents">
+    <!--more-->
+    <h1>Setting up  a new project</h1>
+    <p>
+        First, create a <strong>Pure Python</strong> project in PyCharm in a source control repository.
+        If you are new to PyCharm, do the following:
+        <br>
+        <code>File -> New Project -> Pure Python</code>
+        <br>
+        and then select the location.
+        <br>
+        <a href="https://4.bp.blogspot.com/-6hEp8DhCZk4/XkRmWWOIQKI/AAAAAAAAASY/k0pNzkeZv5UXqJVc2wWzBZHEN0McXu-5wCLcBGAsYHQ/s1600/pycharm-new-project.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-6hEp8DhCZk4/XkRmWWOIQKI/AAAAAAAAASY/k0pNzkeZv5UXqJVc2wWzBZHEN0McXu-5wCLcBGAsYHQ/s320/pycharm-new-project.png" width="320" height="179" data-original-width="966" data-original-height="540" /></a>
+    </p>
+    <p>
+        Then, create a new folder inside the project which is the Blender Add-on package that will eventually be run by Blender.
+        This is the folder where all your files for the add-on will go.
+    </p>
+    <p>
+        Then add an <strong>__init__.py</strong> file inside the add-on folder.
+        This file is the entry point of your add-on.
+        The initial code in the file can look something like this:
+    </p>
+    <pre>
 <code class="prettyprint lang-python linenums" data-start-visible="true">
     import bpy
 
 
     bl_info = {
-        "name": "Example Addon",
+        "name": "Example Add-on",
         "author": "Luna",
         "version": (0, 0, 1),
         "blender": (2, 80, 0),
@@ -44,7 +47,7 @@
     }
 
     # Add your Blender classes here after importing them
-    classes = (Example.menu_open_op)
+    classes = ()
     register, unregister = bpy.utils.register_classes_factory(classes)
 
     # This allows you to run the script directly from Blender's Text editor
@@ -53,58 +56,77 @@
         register()
 </code>
 </pre>
-        <h1>Sym-linking folder to blender</h1>
-        <p>
-            Blender wants the add-on folder to be inside the blender add-on folder which on my computer is located at
-            <strong>C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons</strong> .
-            To create a symlink we need to use command prompt run as administrator.
-            Then run the following syntax:
-            <code>mklink /D Target Source</code> .
-            <br>
-            The mklink with actual paths:
-            <code>mklink /D "C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons\example-addon" "C:\Users\User\example-project\example-addon"</code>
-        </p>
-        <h1>Getting bpy module for auto-complete</h1>
-        <p>
-            From what I found there are few ways to generate types for blender such as generate them yourself.
-            But the only way that I managed to do was to download already generated typings for Blender.
-            I chose <strong>fake-bpy module</strong> that can be found at <a href="https://github.com/nutti/fake-bpy-module">https://github.com/nutti/fake-bpy-module</a>.
-            There are two ways to install fake-bpy-module.
-            One way is to use pip and add the <strong>fake-bpy-module-2.80</strong> package.
-            <br>
-            <a href="https://1.bp.blogspot.com/-VzPmeVlPMAk/XkRmj8gc-1I/AAAAAAAAASc/t4WSNjwqnvoeBEHDvlB_IyZwPAIWzXOuACLcBGAsYHQ/s1600/pycharm-pip-fake-bpy-module.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-VzPmeVlPMAk/XkRmj8gc-1I/AAAAAAAAASc/t4WSNjwqnvoeBEHDvlB_IyZwPAIWzXOuACLcBGAsYHQ/s320/pycharm-pip-fake-bpy-module.png" width="320" height="211" data-original-width="1366" data-original-height="902" /></a>
-        </p>
-        <p>
-            The other way is to download the package yourself and place it inside your project.
-            The packages can be downloaded here: <a href="https://github.com/nutti/fake-bpy-module/releases">https://github.com/nutti/fake-bpy-module/releases</a>
-            I placed the files inside a <strong>fake-bpy-module</strong> folder and then marked the directory as a source root.
-            <br>
-            <a href="https://4.bp.blogspot.com/-u_njiULBOHo/XkRmv3YbTXI/AAAAAAAAASk/lg2uDSjoRQgr_FTI6opL9xyJyTHbssRTwCLcBGAsYHQ/s1600/pycharm-fake-bpy-module.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-u_njiULBOHo/XkRmv3YbTXI/AAAAAAAAASk/lg2uDSjoRQgr_FTI6opL9xyJyTHbssRTwCLcBGAsYHQ/s320/pycharm-fake-bpy-module.png" width="280" height="320" data-original-width="608" data-original-height="695" /></a>
-        </p>
-        <h1>You're finished!</h1>
-        <p>
-            That should be all the steps to set up your very first Blender add-on project.
-            Now you can add things like operators, panels etc so you can actually do something in Blender!
-            My project folder looked like this when finished:
-            <br>
-            <a href="https://1.bp.blogspot.com/-KZZgbaxKiPI/XkRm3S3fR_I/AAAAAAAAASs/8j4MOTTGL0YjK0Yx4XbTBpNpNe-TOEAZgCLcBGAsYHQ/s1600/example-project-folder-structure.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-KZZgbaxKiPI/XkRm3S3fR_I/AAAAAAAAASs/8j4MOTTGL0YjK0Yx4XbTBpNpNe-TOEAZgCLcBGAsYHQ/s320/example-project-folder-structure.png" width="320" height="246" data-original-width="275" data-original-height="211" /></a>
-        </p>
-        <p>
-            To continue your first Blender add-on here is a link to the official tutorial:
-            <a href="https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html">https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html</a>
-        </p>
-        <h1>More reading</h1>
-        <p>
-            Other Blender related blog posts by me that may be of interest:
-        </p>
-        <ul>
-            <li>
-                <a href="/2020/01/easily-reloading-blender-addon.html">Reload modified 2.80 Blender Add-on</a>
-            </li>
-            <li>
-                <a href="/2020/01/easily-reloading-blender-addon.html">How to add user preferences for a Blender Add-on</a>
-            </li>
-        </ul>
-    </div>
+    <h1>Symlinking folder to Blender</h1>
+    <p>
+        Blender wants the add-on folder to be inside the Blender Add-on folder, which on my computer is located at
+        <br>
+        <strong>C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons</strong>.
+    </p>
+    <p>
+        To create a symlink on Windows 10, we need to use command prompt run as administrator.
+        Then run the following syntax replacing Target and Source with your folder paths:
+        <br>
+        <code>mklink /D "Target" "Source"</code>.
+        <br>
+        For my project I used this command:
+        <br>
+        <code>mklink /D "C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons\example-addon" "C:\Users\User\example-project\example-addon"</code>
+    </p>
+    <h2>Confirming the symlink and add-on works</h2>
+    <p>
+        If everything went well with the symlink, you should now have a folder inside your Blender Add-on folder (<i>C:\Program Files\Blender Foundation\Blender\2.80\scripts\addons</i>).
+        To confirm that it works you should now be able to see the add-on inside Blender.
+        <br>
+        <code>Edit -> Preferences... -> Add-ons -> Search for your add-on</code>
+        <br>
+        <a href="https://4.bp.blogspot.com/-bQQzZY32nuU/XkWR2Z3AbfI/AAAAAAAAAS8/NVn-8up2IWUgvLsmOco6SCw4EbLUhBbhQCLcBGAsYHQ/s1600/example-addon-in-blender.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-bQQzZY32nuU/XkWR2Z3AbfI/AAAAAAAAAS8/NVn-8up2IWUgvLsmOco6SCw4EbLUhBbhQCLcBGAsYHQ/s320/example-addon-in-blender.png" width="320" height="263" data-original-width="668" data-original-height="549" /></a>
+    </p>
+    <h1>Getting code completion for the bpy module</h1>
+    <p>
+        The Blender API is on the module <strong>bpy</strong>, which is why we need to do <code>import bpy</code> inside <strong>__init__.py</strong>.
+        But to get code completion for the Blender API we need to add the typings for the bpy module.
+        This can be done by either adding already existing typings, or generate them from Blender.
+        I failed to generate them from Blender myself so I downloaded them.
+    </p>
+    <p>
+        I chose <strong>fake-bpy module</strong> that can be found at <a href="https://github.com/nutti/fake-bpy-module">https://github.com/nutti/fake-bpy-module</a>.
+        There are two ways to install fake-bpy-module.
+        One way is to use pip and add the <strong>fake-bpy-module-2.80</strong> package.
+        If you're on a different version than Blender 2.80 then pick that version.
+        <br>
+        <a href="https://1.bp.blogspot.com/-VzPmeVlPMAk/XkRmj8gc-1I/AAAAAAAAASc/t4WSNjwqnvoeBEHDvlB_IyZwPAIWzXOuACLcBGAsYHQ/s1600/pycharm-pip-fake-bpy-module.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-VzPmeVlPMAk/XkRmj8gc-1I/AAAAAAAAASc/t4WSNjwqnvoeBEHDvlB_IyZwPAIWzXOuACLcBGAsYHQ/s320/pycharm-pip-fake-bpy-module.png" width="320" height="211" data-original-width="1366" data-original-height="902" /></a>
+    </p>
+    <p>
+        The other way is to download the package yourself and place it inside your project.
+        The packages can be downloaded here: <a href="https://github.com/nutti/fake-bpy-module/releases">https://github.com/nutti/fake-bpy-module/releases</a>
+        I placed the files inside a <strong>fake-bpy-module</strong> folder, and then marked the directory as a source root.
+        <br>
+        <a href="https://4.bp.blogspot.com/-u_njiULBOHo/XkRmv3YbTXI/AAAAAAAAASk/lg2uDSjoRQgr_FTI6opL9xyJyTHbssRTwCLcBGAsYHQ/s1600/pycharm-fake-bpy-module.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-u_njiULBOHo/XkRmv3YbTXI/AAAAAAAAASk/lg2uDSjoRQgr_FTI6opL9xyJyTHbssRTwCLcBGAsYHQ/s320/pycharm-fake-bpy-module.png" width="280" height="320" data-original-width="608" data-original-height="695" /></a>
+    </p>
+    <h1>You're finished!</h1>
+    <p>
+        These should be all the steps to set up your very first Blender Add-on project.
+        Now you can add things like operators, panels, etc., so you can actually do or see something in Blender!
+        My project folder looked like this when finished:
+        <br>
+        <a href="https://1.bp.blogspot.com/-KZZgbaxKiPI/XkRm3S3fR_I/AAAAAAAAASs/8j4MOTTGL0YjK0Yx4XbTBpNpNe-TOEAZgCLcBGAsYHQ/s1600/example-project-folder-structure.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-KZZgbaxKiPI/XkRm3S3fR_I/AAAAAAAAASs/8j4MOTTGL0YjK0Yx4XbTBpNpNe-TOEAZgCLcBGAsYHQ/s320/example-project-folder-structure.png" width="320" height="246" data-original-width="275" data-original-height="211" /></a>
+    </p>
+    <p>
+        To continue your first Blender add-on, here is a link to the official tutorial:
+        <a href="https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html">https://docs.blender.org/manual/en/latest/advanced/scripting/addon_tutorial.html</a>
+    </p>
+    <h1>More reading</h1>
+    <p>
+        Other Blender-related blog posts by me that may be of interest:
+    </p>
+    <ul>
+        <li>
+            <a href="/2020/01/easily-reloading-blender-addon.html">Reload modified 2.80 Blender Add-on</a>
+        </li>
+        <li>
+            <a href="/2020/01/easily-reloading-blender-addon.html">How to add user preferences for a Blender Add-on</a>
+        </li>
+    </ul>
+</div>
 </body>
 </html>
