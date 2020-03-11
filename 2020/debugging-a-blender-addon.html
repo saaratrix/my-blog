@@ -18,16 +18,19 @@
         1. Install the remote_debugger Blender add-on
     </h1>
     <p>
-        <strong><a href="https://github.com/sybrenstuve">Sybren A. Stüvel</a></strong> has developed a Blender Add-on called <strong>Remote debugger</strong> which is what makes the remote debugging possible.
+        <strong><a href="https://github.com/sybrenstuvel">Sybren A. Stüvel</a></strong> has developed a Blender Add-on called <strong>Remote debugger</strong> which is what makes the remote debugging possible.
         The add-on can be found here:
 <!--        <a href="https://github.com/sybrenstuvel/random-blender-addons/blob/master/remote_debugger.py">https://github.com/sybrenstuvel/random-blender-addons/blob/master/remote_debugger.py</a>.-->
         <a href="https://github.com/saaratrix/random-blender-addons/blob/pydevd-to-pydevd_pycharm/remote_camera_control.py">https://github.com/saaratrix/random-blender-addons/blob/pydevd-to-pydevd_pycharm/remote_camera_control.py</a>.
+        <br>
         <br>
         I have modified the add-on and have made a Pull Request to Sybren to use <strong>pydevd_pycharm</strong> instead of <strong>pydevd</strong> as the debug library to get it working with later PyCharm versions.
         <a href="https://github.com/sybrenstuvel/random-blender-addons/pull/4">https://github.com/sybrenstuvel/random-blender-addons/pull/4</a>
     </p>
     <p>
         After downloading the file, do these steps in Blender: <code>open preferences menu -> Add-ons -> Install... -> Select the remote_debugger.py file -> Click install Add-on</code>
+        <br>
+        <a href="https://3.bp.blogspot.com/-kZmC0mdWfpE/XmlLZDUiDJI/AAAAAAAAAUU/4wDPzcVrFwIDjh1menvI_4_dhRQFOk5BQCLcBGAsYHQ/s1600/debugger_installing.png" imageanchor="1" ><img border="0" src="https://3.bp.blogspot.com/-kZmC0mdWfpE/XmlLZDUiDJI/AAAAAAAAAUU/4wDPzcVrFwIDjh1menvI_4_dhRQFOk5BQCLcBGAsYHQ/s320/debugger_installing.png" width="320" height="126" data-original-width="1070" data-original-height="422" /></a>
     </p>
     <p>
         I created a folder called <strong>remote_debugger</strong> in my Blender Add-on project so I can easily find the file if I need it again.
@@ -49,19 +52,18 @@
     <p>
         To create the remote debug configuration in PyCharm:
         <br>
-        <code>Run -> Edit Configurations ... -> Expand Templates -> Python Remote Debug -> Set port to 1090 -> Click Create Configuration</code>
+        <code>Run -> Edit Configurations ... -> Expand Templates -> Python Remote Debug -> Set port to 1090 -> Click Create Configuration -> Change the name from "Unnamed"</code>
         <br>
         <a href="https://1.bp.blogspot.com/-jFXIvIa36so/XmVIwP_Yr3I/AAAAAAAAATY/N4VSHwqBjb0byy5DKh_zdKyYw5Aq_qkDgCLcBGAsYHQ/s1600/debugger_create_remote_debugger.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-jFXIvIa36so/XmVIwP_Yr3I/AAAAAAAAATY/N4VSHwqBjb0byy5DKh_zdKyYw5Aq_qkDgCLcBGAsYHQ/s320/debugger_create_remote_debugger.png" width="320" height="204" data-original-width="1078" data-original-height="686" /></a>
     </p>
     <p>
-        Now the configuration should be there and go to <code>Edit Configurations ...</code> again and set a name for the one you just created.
-        Or edit the port or localhost if necessary.
+        If you need to edit the configuration go to <code>Edit Configurations ...</code> again to change the name, edit port or the local host name.
     </p>
     <h1>
         4. Run the PyCharm debug configuration
     </h1>
     <p>
-        The next step is to start the remote debugger so that PyCharms listens for <code>pydevd_pycharm.settrace()</code>.
+        The next step is to start the remote debugger so that PyCharms listens for <code>pydevd_pycharm.settrace()</code> statements in the code.
         Just click <code>Run -> Debug ...</code> and then choose the configuration you created in the previous step.
         In the future you can just click <code>Run -> Debug "name"</code> to quickly start it.
         <br>
@@ -72,7 +74,7 @@
     </h1>
     <p>
         This is where we need to use the remote_debugger add-on in Blender to connect to PyCharm.
-        With default keyboard settings you'd do the following:
+        With default keyboard settings you'd do the following where F3 is the "Search Menu" keymap binding:
         <br>
         <code>F3 -> search for "pycharm" -> Select "Connect to remote PyCharm debugger"</code>
         <br>
@@ -94,7 +96,7 @@
         <a href="https://2.bp.blogspot.com/-F1_Fs0S_-rs/XmVKIJkUrqI/AAAAAAAAAT0/UXFySAWZvn4thk1wHjWxJzs7ERXTxLKkgCLcBGAsYHQ/s1600/debugger_set_breakpoint.png" imageanchor="1" ><img border="0" src="https://2.bp.blogspot.com/-F1_Fs0S_-rs/XmVKIJkUrqI/AAAAAAAAAT0/UXFySAWZvn4thk1wHjWxJzs7ERXTxLKkgCLcBGAsYHQ/s320/debugger_set_breakpoint.png" width="320" height="257" data-original-width="461" data-original-height="370" /></a>
     </p>
     <p>
-        This is how it looked like in PyCharm for me when the breakpoint was hit and trying to see what value layout had:
+        This is how it looked like in PyCharm for me when the breakpoint was hit and trying to see what value the variable <code>layout</code> had:
         <br>
         <a href="https://4.bp.blogspot.com/-Sc5HA_VuJoE/XmVP8ogw7_I/AAAAAAAAAUI/vUB_hcvEjbEJMB4BRc8BZM_uH4itNaQAQCLcBGAsYHQ/s1600/debugger_breakpoint_activated.png" imageanchor="1" ><img border="0" src="https://4.bp.blogspot.com/-Sc5HA_VuJoE/XmVP8ogw7_I/AAAAAAAAAUI/vUB_hcvEjbEJMB4BRc8BZM_uH4itNaQAQCLcBGAsYHQ/s320/debugger_breakpoint_activated.png" width="320" height="295" data-original-width="833" data-original-height="768" /></a>
     </p>
