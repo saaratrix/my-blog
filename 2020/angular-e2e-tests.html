@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular E2E Tests Introduction</title>
+</head>
+<body>
+<p>
+    This is an introduction to <a href="">Angular E2E tests</a> where I'll mention what end to end tests are and showing some examples.
+    The examples will be using Angular 10.
+    The e2e tests is a useful way to test your website as a user.
+    An example of an e2e test that we will implement:
+</p>
+<ol>
+    <li>Logs in</li>
+    <li>Creates an item</li>
+    <li>Modifies the item</li>
+    <li>Deletes the item</li>
+    <li>Logs out</li>
+</ol>
+<p>
+    Source code can be found at <a href="#">https://github.com/saaratrix/TODO</a>
+</p>
+<!--more-->
+<div id="toc" class="hide"></div>
+<div id="contents">
+    <p>
+        Angular uses <a href="https://www.protractortest.org/#/">Protractor</a> to do the e2e tests.
+        If you generate a project with the Angular CLI it's very simple to run your e2e tests by simply running <code>ng e2e</code>.
+    </p>
+    <h1>Basic E2E test information</h1>
+    <h2>Folder structure</h2>
+    <p>
+        If you created an angular application using the cli it should look something like in this image:
+        <br>
+        <!-- folder-structure-angular-10.jpeg -->
+        <br>
+        The folder that the e2e test goes to is the e2e folder. If you want a different folder make sure it's included in the <code>protractor.conf.js file</code>.
+    </p>
+    <h2>Running the tests</h2>
+    <p>
+        You can verify that the default test is working by writing <code>ng e2e</code> or <code>npm run e2e</code> in the terminal.
+        A browser will open that will run the tests.
+        <br>
+        <!-- chrome-automated.png -->
+        <br>
+    </p>
+    <p>
+        Running the tests using <code>ng e2e</code> can be very time consuming for a larger app.
+        So for example in Webstorm we can run a specific e2e test which makes it easier when coding the test by doing the following:
+    </p>
+    <ol>
+        <li>
+            Run the app normally with <code>ng serve</code> or similar.
+            If you don't do ng serve you'll get a message that the website could not be reached when running the test.
+        </li>
+        <li>
+            Click on the green arrow to run as specific test.
+            <br>
+            <!-- webstorm-runs-specific-test.jpg -->
+        </li>
+    </ol>
+    <h2>The test's code</h2>
+    <h3>app.e2e.spec.ts</h3>
+    <pre class="prettyprint lang-js linenums">
+<code>
+import { AppPage } from './app.po';
+import { browser, logging } from 'protractor';
+
+describe('workspace-project App', () => {
+  let page: AppPage;
+
+  beforeEach(() => {
+    page = new AppPage();
+  });
+
+  it('should display welcome message', () => {
+    page.navigateTo();
+    expect(page.getTitleText()).toEqual('my-blog-angular-e2e app is running!');
+  });
+
+  afterEach(async () => {
+    // Assert that there are no errors emitted from the browser
+    const logs = await browser.manage().logs().get(logging.Type.BROWSER);
+    expect(logs).not.toContain(jasmine.objectContaining({
+      level: logging.Level.SEVERE,
+    } as logging.Entry));
+  });
+});
+</code>
+    </pre>
+    <p>
+        Our e2e test is using jasmine which is something you can change in the <code>protractor.conf.js</code> file if you want to.
+        The test first creates our <strong>Page Object</strong> <code>AppPage</code> before each test.
+        More about the page objects later but in short it's what we use to handle the DOM interactions or a sequence of actions.
+    </p>
+    <h3>app.po.ts</h3>
+    <pre class="prettyprint lang-js linenums">
+<code>
+import { browser, by, element } from 'protractor';
+
+export class AppPage {
+  navigateTo(): Promise&lt;unknown&gt; {
+    return browser.get(browser.baseUrl) as Promise&lt;unknown&gt;;
+  }
+
+  getTitleText(): Promise&lt;string&gt; {
+    return element(by.css('app-root .content span')).getText() as Promise&lt;string>;
+  }
+}
+</code>
+    </pre>
+    <p>
+        In the AppPage page object there is code that is relevant to the app page.
+        So in this example it can navigate to the app page and get the app's title text.
+    </p>
+
+    <h2>What are Page Objects?</h2>
+    <p>
+        The page object is a pattern to write reusable e2e test code.
+        As seen in the example above it has methods that navigates you to the page, or get an element and the text.
+        It makes it simple to write more e2e tests because you can now easily reuse the functionality.
+        So for example if you write a login sequence you can now use it in all your e2e tests.
+    </p>
+    <p>
+        Some links about page objects for further reading:
+        <br>
+        <a href="https://github.com/SeleniumHQ/selenium/wiki/PageObjects">https://github.com/SeleniumHQ/selenium/wiki/PageObjects</a>
+        <br>
+        <a href="https://www.protractortest.org/#/page-objects">https://www.protractortest.org/#/page-objects</a>
+        <br>
+        <a href="https://martinfowler.com/bliki/PageObject.html"></a>
+    </p>
+    <h2>protractor.conf.js</h2>
+    <pre class="prettyprint lang-js linenums">
+<code>
+// @ts-check
+// Protractor configuration file, see link for more information
+// https://github.com/angular/protractor/blob/master/lib/config.ts
+
+const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
+
+/**
+ * @type { import("protractor").Config }
+ */
+exports.config = {
+  allScriptsTimeout: 11000,
+  specs: [
+    './src/**/*.e2e-spec.ts'
+  ],
+  capabilities: {
+    browserName: 'chrome'
+  },
+  directConnect: true,
+  baseUrl: 'http://localhost:4200/',
+  framework: 'jasmine',
+  jasmineNodeOpts: {
+    showColors: true,
+    defaultTimeoutInterval: 30000,
+    print: function() {}
+  },
+  onPrepare() {
+    require('ts-node').register({
+      project: require('path').join(__dirname, './tsconfig.json')
+    });
+    jasmine.getEnv().addReporter(new SpecReporter({
+      spec: {
+        displayStacktrace: StacktraceOption.PRETTY
+      }
+    }));
+  }
+};
+</code>
+    </pre>
+    <p>
+        This is the file that makes protractor know what files to run, what browser to use and what testing framework and more.
+        If you have very long tests you need to change the <code>jasmineNodeOpts.defaultTimeoutInterval</code> variable or your tests will fail from timeouts.
+    </p>
+
+    <h1>Log in, handle an item and log out example</h1>
+    <p>
+        The example's source code an be found here: <a href="https://github.com/saaratrix/angular-e2e-example">https://github.com/saaratrix/angular-e2e-example</a>.
+    </p>
+    <p>
+        Here is how the test looks like when using <code>npm run e2e</code>.
+        <br>
+        <!-- giffy! -->
+    </p>
+    <p>
+        The test's spec file can be found here: <a href="https://github.com/saaratrix/">https://github.com/saaratrix/TODO</a>.
+        It does the following:
+    </p>
+    <ol>
+        <li>First we login</li>
+        <li>Then we create an item</li>
+        <li>We assert that an item was created by checking item count.</li>
+        <li>We delete an item</li>
+        <li>We assert that the item was deleted by checking item count.</li>
+        <li>We logout</li>
+        <li>We assert that the login button is visible.</li>
+    </ol>
+    <p>
+        By using the page object pattern we get very little code in the test itself and it's easy to follow each step.
+    </p>
+    <pre class="prettyprint lang-js linenums">
+<code>
+it('should login, create item, edit item, delete item and then log out.', () => {
+    loginPage.login('saaratrix', '123456');
+    appPage.createItem('item Nuu');
+    const currentItems = appPage.getItems();
+    expect(currentItems.count()).toBe(1);
+    appPage.updateItem('item Nuu', 'modified Nuu');
+    appPage.deleteItem('modified Nuu');
+    // We don't need to get the items again because it re-evaluates the count when called.
+    expect(currentItems.count()).toBe(0);
+    loginPage.logout();
+
+    expect(loginPage.getSignInButton().isDisplayed()).toBe(true);
+});
+</code>
+    </pre>
+    <h2>Knowing what to select in the page object?</h2>
+    <p>
+        A lot of the work when writing the e2e tests is writing the code inside the page objects.
+        Since this is where all our DOM interactions happen.
+    </p>
+    <p>
+        This means that to write e2e tests you must know how to find the elements you're after by either CSS selector or XPath.
+        You can test the CSS selector simply by writing <code>document.querySelector('selector query')</code>.
+        For XPath you can use <code>$x('xpath query')</code> in both Chrome and Firefox.
+    </p>
+    <h1>Tips & Tricks</h1>
+    <ul>
+        <li>
+            Protractor is not executed synchronously.
+            The test code may look synchronous but everytime you do a <code>browser.</code> call you're adding a promise to some internal resolver.
+            So for example if you want to get the time it takes between two parts in a test you can use <code>.then()</code> on the promise.
+        </li>
+        <li>
+            If you see the error message <strong>Invalid locator</strong> it's very likely you forgot to write <code>by.css()</code> or another method inside the <code>element()</code>.
+        </li>
+    </ul>
+</div>
+</body>
+</html>
