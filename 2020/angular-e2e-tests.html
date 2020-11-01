@@ -6,10 +6,8 @@
 </head>
 <body>
 <p>
-    This is an introduction to <a href="">Angular E2E tests</a> where I'll mention what end to end tests are and showing some examples.
-    The examples will be using Angular 10.
-    The e2e tests is a useful way to test your website as a user.
-    An example of an e2e test that we will implement:
+    This is an introduction to <strong>Angular E2E tests</strong> with two examples using Angular 10.
+    The first examples is the Angular 10 CLI default test and the second test does the following:
 </p>
 <ol>
     <li>Logs in</li>
@@ -19,35 +17,53 @@
     <li>Logs out</li>
 </ol>
 <p>
-    Source code can be found at <a href="#">https://github.com/saaratrix/TODO</a>
+    Angular uses <a href="https://www.protractortest.org/#/">Protractor</a> to do the e2e tests.
+    If you generate a project with the Angular CLI it's very simple to run your e2e tests by simply running <code>ng e2e</code>.
+</p>
+<p>
+    Source code can be found at <a href="https://github.com/saaratrix/angular-e2e-example">https://github.com/saaratrix/angular-e2e-example</a>
 </p>
 <!--more-->
 <div id="toc" class="hide"></div>
 <div id="contents">
+    <h1>Why should I use E2E tests?</h1>
     <p>
-        Angular uses <a href="https://www.protractortest.org/#/">Protractor</a> to do the e2e tests.
-        If you generate a project with the Angular CLI it's very simple to run your e2e tests by simply running <code>ng e2e</code>.
+        E2E tests can be useful to automate a sequence of actions or that everything works as it mimics a user browsing the website.
+        For example you could have E2E tests that does the most common things like login, interact with something, then something else and finally logout.
+        You can then be certain at least those cases work without having to manually test it yourself every time.
+        In the <code>protractor.conf.js</code> file you can set the URL you're testing so you could test directly against your production server.
     </p>
-    <h1>Basic E2E test information</h1>
-    <h2>Folder structure</h2>
+    <h1>The default Angular 10 CLI example</h1>
     <p>
         If you created an angular application using the cli it should look something like in this image:
         <br>
-        <!-- folder-structure-angular-10.jpeg -->
+        <a href="https://1.bp.blogspot.com/-cGbLzZ-tAFo/X56qWgonsGI/AAAAAAAAAWo/iQvxj7tftfcXZqErNDyG8IzVsqg5Kg44QCPcBGAYYCw/s731/folder-structure-angular-10.png">
+            <img alt="" border="0" height="200" data-original-height="731" data-original-width="481" src="https://1.bp.blogspot.com/-cGbLzZ-tAFo/X56qWgonsGI/AAAAAAAAAWo/iQvxj7tftfcXZqErNDyG8IzVsqg5Kg44QCPcBGAYYCw/s200/folder-structure-angular-10.png"/>
+        </a>
         <br>
-        The folder that the e2e test goes to is the e2e folder. If you want a different folder make sure it's included in the <code>protractor.conf.js file</code>.
+        The e2e tests goes to the e2e folder.
+        If you want a different folder make sure it's included in the <code>protractor.conf.js</code> file.
     </p>
     <h2>Running the tests</h2>
     <p>
-        You can verify that the default test is working by writing <code>ng e2e</code> or <code>npm run e2e</code> in the terminal.
-        A browser will open that will run the tests.
+        You can run the tests by doing the command <code>ng e2e</code> or <code>npm run e2e</code>.
+        A browser will then open that runs the tests.
         <br>
-        <!-- chrome-automated.png -->
+        <a href="https://1.bp.blogspot.com/--CJXfRZxPn0/X56r1ZBxiZI/AAAAAAAAAWw/ARXdAoxtYvMot5NGn-JFXFQ7LjFeda2GwCLcBGAsYHQ/s1004/chrome-automated-notification.png">
+            <img alt="" border="0" height="200" data-original-height="1004" data-original-width="923" src="https://1.bp.blogspot.com/--CJXfRZxPn0/X56r1ZBxiZI/AAAAAAAAAWw/ARXdAoxtYvMot5NGn-JFXFQ7LjFeda2GwCLcBGAsYHQ/s200/chrome-automated-notification.png"/>
+        </a>
         <br>
     </p>
     <p>
-        Running the tests using <code>ng e2e</code> can be very time consuming for a larger app.
-        So for example in Webstorm we can run a specific e2e test which makes it easier when coding the test by doing the following:
+        Running all the tests using <code>ng e2e</code> can be very time consuming for a larger app.
+        This is because it has to compile the whole application before running the tests and to start a browser.
+        It can also be time consuming because you have many tests or tests that take a lot of time to run.
+    </p>
+    <p>
+        In Webstorm you can drastically reduce the time spent developing E2E tests by running specific tests.
+        Webstorm can do this because it skips the compiling part by using the <code>ng serve</code> build.
+        There might be a similar feature in VS Code or other editors to run a specific test.
+        Here's how to run a specific test in Webstorm:
     </p>
     <ol>
         <li>
@@ -57,11 +73,23 @@
         <li>
             Click on the green arrow to run as specific test.
             <br>
-            <!-- webstorm-runs-specific-test.jpg -->
+            <a href="https://1.bp.blogspot.com/-nGk2vt-fhho/X56sairU8CI/AAAAAAAAAW4/Rj7dyDBVd8wP5Je6tdKOhhKgEPPCwUMSwCLcBGAsYHQ/s795/webstorm-runs-specific-test.png">
+                <img alt="" border="0" width="200" data-original-height="523" data-original-width="795" src="https://1.bp.blogspot.com/-nGk2vt-fhho/X56sairU8CI/AAAAAAAAAW4/Rj7dyDBVd8wP5Je6tdKOhhKgEPPCwUMSwCLcBGAsYHQ/s200/webstorm-runs-specific-test.png"/>
+            </a>
         </li>
     </ol>
-    <h2>The test's code</h2>
-    <h3>app.e2e.spec.ts</h3>
+    <h2>The default test's code</h2>
+    <p>
+        When you look at the default test's code you might notice that it looks a lot like a unit test.
+        The e2e test is using jasmine and if you want to change that you can do that in the <code>protractor.conf.js</code> file.
+    </p>
+    <h3>app.e2e-spec.ts</h3>
+    <p>
+        The test first creates our <strong>Page Object</strong> <code>AppPage</code> before each test.
+        More about the page objects later but in short it's a design pattern to handle the DOM interactions or a sequence of actions.
+        Then the test navigates to the app page and checks that the titleText is as expected.
+        Finally the test checks for any error messages in the console log.
+    </p>
     <pre class="prettyprint lang-js linenums">
 <code>
 import { AppPage } from './app.po';
@@ -76,7 +104,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('my-blog-angular-e2e app is running!');
+    expect(page.getTitleText()).toEqual('angular-e2e-example app is running!');
   });
 
   afterEach(async () => {
@@ -87,14 +115,12 @@ describe('workspace-project App', () => {
     } as logging.Entry));
   });
 });
-</code>
-    </pre>
-    <p>
-        Our e2e test is using jasmine which is something you can change in the <code>protractor.conf.js</code> file if you want to.
-        The test first creates our <strong>Page Object</strong> <code>AppPage</code> before each test.
-        More about the page objects later but in short it's what we use to handle the DOM interactions or a sequence of actions.
-    </p>
+</code></pre>
     <h3>app.po.ts</h3>
+    <p>
+        In the AppPage page object there is code that is relevant to the app page.
+        Navigate to the app page and get the app's title text.
+    </p>
     <pre class="prettyprint lang-js linenums">
 <code>
 import { browser, by, element } from 'protractor';
@@ -108,19 +134,14 @@ export class AppPage {
     return element(by.css('app-root .content span')).getText() as Promise&lt;string>;
   }
 }
-</code>
-    </pre>
-    <p>
-        In the AppPage page object there is code that is relevant to the app page.
-        So in this example it can navigate to the app page and get the app's title text.
-    </p>
+</code></pre>
 
     <h2>What are Page Objects?</h2>
     <p>
-        The page object is a pattern to write reusable e2e test code.
-        As seen in the example above it has methods that navigates you to the page, or get an element and the text.
+        The page object is a design pattern to write reusable e2e test code.
+        As seen in the test above it has methods that navigates you to the page, or get an element and the text.
         It makes it simple to write more e2e tests because you can now easily reuse the functionality.
-        So for example if you write a login sequence you can now use it in all your e2e tests.
+        For example if you write login and logout methods you can now use them in all the tests.
     </p>
     <p>
         Some links about page objects for further reading:
@@ -129,9 +150,17 @@ export class AppPage {
         <br>
         <a href="https://www.protractortest.org/#/page-objects">https://www.protractortest.org/#/page-objects</a>
         <br>
-        <a href="https://martinfowler.com/bliki/PageObject.html"></a>
+        <a href="https://martinfowler.com/bliki/PageObject.html">https://martinfowler.com/bliki/PageObject.html</a>
     </p>
     <h2>protractor.conf.js</h2>
+    <p>
+        This is the file that makes protractor know what files to run, what browser to use and what testing framework and more.
+        If you have very long tests you need to either change the <code>jasmineNodeOpts.defaultTimeoutInterval</code> variable or pass the duration to the <code>it()</code> method.
+        <br>
+        <a href="https://1.bp.blogspot.com/-Ap_kgz9TCqo/X57EoEs6QxI/AAAAAAAAAXM/GtNxI9vRHVkny_juNY6s4gVXBqN2Kf-ZgCLcBGAsYHQ/s607/jasmine_defaultTimeoutInterval.png">
+            <img alt="" border="0" width="200" data-original-height="531" data-original-width="607" src="https://1.bp.blogspot.com/-Ap_kgz9TCqo/X57EoEs6QxI/AAAAAAAAAXQ/a74KtOIWjfwv1xQ9jwhQtZ2S5aDXYXsowCPcBGAYYCw/s200/jasmine_defaultTimeoutInterval.png"/>
+        </a>
+    </p>
     <pre class="prettyprint lang-js linenums">
 <code>
 // @ts-check
@@ -170,12 +199,7 @@ exports.config = {
     }));
   }
 };
-</code>
-    </pre>
-    <p>
-        This is the file that makes protractor know what files to run, what browser to use and what testing framework and more.
-        If you have very long tests you need to change the <code>jasmineNodeOpts.defaultTimeoutInterval</code> variable or your tests will fail from timeouts.
-    </p>
+</code></pre>
 
     <h1>Log in, handle an item and log out example</h1>
     <p>
@@ -184,10 +208,11 @@ exports.config = {
     <p>
         Here is how the test looks like when using <code>npm run e2e</code>.
         <br>
-        <!-- giffy! -->
+        <img alt="" border="0" data-original-height="654" data-original-width="600" src="https://1.bp.blogspot.com/-tAyTNQcUn0w/X56sp4pPSFI/AAAAAAAAAXE/4_2EirsJSms_AcqLHzI8sm8nyfnb2bmrACPcBGAYYCw/s0/e2etest.gif"/>
     </p>
     <p>
-        The test's spec file can be found here: <a href="https://github.com/saaratrix/">https://github.com/saaratrix/TODO</a>.
+        The test's spec file can be found here:
+        <a href="https://github.com/saaratrix/angular-e2e-example/blob/main/e2e/src/app.e2e-spec.ts">https://github.com/saaratrix/angular-e2e-example/blob/main/e2e/src/app.e2e-spec.ts</a>.
         It does the following:
     </p>
     <ol>
@@ -202,7 +227,7 @@ exports.config = {
     <p>
         By using the page object pattern we get very little code in the test itself and it's easy to follow each step.
     </p>
-    <pre class="prettyprint lang-js linenums">
+    <pre class="prettyprint lang-js linenums" data-start-visible="true">
 <code>
 it('should login, create item, edit item, delete item and then log out.', () => {
     loginPage.login('saaratrix', '123456');
@@ -217,8 +242,8 @@ it('should login, create item, edit item, delete item and then log out.', () => 
 
     expect(loginPage.getSignInButton().isDisplayed()).toBe(true);
 });
-</code>
-    </pre>
+</code></pre>
+
     <h2>Knowing what to select in the page object?</h2>
     <p>
         A lot of the work when writing the e2e tests is writing the code inside the page objects.
@@ -238,6 +263,11 @@ it('should login, create item, edit item, delete item and then log out.', () => 
         </li>
         <li>
             If you see the error message <strong>Invalid locator</strong> it's very likely you forgot to write <code>by.css()</code> or another method inside the <code>element()</code>.
+        </li>
+        <li>
+            If you want to get the parent of an element you can do that with XPath (<code>by.xpath('..')</code>).
+            <code>element(by.css('.foo')).element(by.xpath('..'));</code>.
+            I have tried to find a better way but this is the simplest way that I know of so far.
         </li>
     </ul>
 </div>
