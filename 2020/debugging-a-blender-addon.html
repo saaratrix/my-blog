@@ -83,13 +83,23 @@
         <br>
         <a href="https://1.bp.blogspot.com/-600U9ndSy58/XmVPFRY5ftI/AAAAAAAAAUA/3cjdjluQOwkhjdNgW52e9llnTgRD115RwCLcBGAsYHQ/s1600/debugger_connected_to_pycharm.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-600U9ndSy58/XmVPFRY5ftI/AAAAAAAAAUA/3cjdjluQOwkhjdNgW52e9llnTgRD115RwCLcBGAsYHQ/s320/debugger_connected_to_pycharm.png" width="320" height="298" data-original-width="810" data-original-height="754" /></a>
     </p>
+    <p>
+        When I upgraded from Pycharm 2019.3 to 2020.1 the debugger stopped working for me.
+        It gave me the error <strong>Expected: C:\...\debug-eggs\pydevd-pycharm.egg\pydevd_attach_to_process\attach_amd64.dll to exist.</strong>
+        This was solved by renaming the <strong>.egg</strong> file to <strong>.zip</strong> and unzip the content and then rename that folder to <strong>pydevd-pycharm.egg</strong>.
+        <br>
+        <a href="https://1.bp.blogspot.com/-cMbNcsFVeww/X6GY6DAMAAI/AAAAAAAAAXY/4ehNhkJFvZoNaFh9Y-ES_R4dI3Oq-FArQCLcBGAsYHQ/s0/pydevd-pycharm.egg-folder.png" imageanchor="1">
+            <img alt="" border="0" data-original-height="124" data-original-width="670" src="https://1.bp.blogspot.com/-cMbNcsFVeww/X6GY6DAMAAI/AAAAAAAAAXY/4ehNhkJFvZoNaFh9Y-ES_R4dI3Oq-FArQCLcBGAsYHQ/s0/pydevd-pycharm.egg-folder.png"/>
+        </a>
+    </p>
     <h1>
         6. Add pydevd_pycharm.settrace() in code
     </h1>
     <p>
-        All that's left is to add <code>pydevd_pycharm.settrace()</code> in the code and a breakpoint will happen and you can debug the code and step over or into functions and so on.
+        All that's left is to add <code>import pydevd_pycharm; pydevd_pycharm.settrace()</code> in the code and a breakpoint will happen and you can debug the code and step over or into functions and so on.
+        The reason for inlining <code>import pydevd_pycharm;</code> before calling the <code>settrace()</code> method is that if you declare it at the top of the file, then blender might throw an import module error.
         <br>
-        <a href="https://2.bp.blogspot.com/-F1_Fs0S_-rs/XmVKIJkUrqI/AAAAAAAAAT0/UXFySAWZvn4thk1wHjWxJzs7ERXTxLKkgCLcBGAsYHQ/s1600/debugger_set_breakpoint.png" imageanchor="1" ><img border="0" src="https://2.bp.blogspot.com/-F1_Fs0S_-rs/XmVKIJkUrqI/AAAAAAAAAT0/UXFySAWZvn4thk1wHjWxJzs7ERXTxLKkgCLcBGAsYHQ/s320/debugger_set_breakpoint.png" width="320" height="257" data-original-width="461" data-original-height="370" /></a>
+        <a href="https://1.bp.blogspot.com/-BxSXAP5cXVI/X6Ga-YcvDVI/AAAAAAAAAXk/Vm_EfPDAN84SLV_O0yAR7-5ZLCh48g1SwCPcBGAYYCw/s482/debugger_set_breakpoint.png" imageanchor="1" ><img border="0" src="https://1.bp.blogspot.com/-BxSXAP5cXVI/X6Ga-YcvDVI/AAAAAAAAAXk/Vm_EfPDAN84SLV_O0yAR7-5ZLCh48g1SwCPcBGAYYCw/s600/debugger_set_breakpoint.png" width="320" height="257" data-original-width="461" data-original-height="370" /></a>
     </p>
     <p>
         This is how it looked like in PyCharm for me when the breakpoint was hit and trying to see what value the variable <code>layout</code> had:
