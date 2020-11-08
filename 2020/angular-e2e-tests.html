@@ -87,14 +87,13 @@
     </p>
     <h3>app.e2e-spec.ts</h3>
     <p>
-        The test first creates our <strong>Page Object</strong> <code>AppPage</code> before each test.
+        Before each test it creates our <strong>Page Object</strong> <code>AppPage</code>.
         More about the page objects later but in short it's a design pattern to handle the DOM interactions or a sequence of actions.
         Then the test navigates to the app page and checks that the title text is as expected.
-        Finally the test checks for any error messages in the console log.
+        Finally after each test it checks for any error messages in the console log.
     </p>
     <pre class="prettyprint lang-js linenums" data-start-visible="true">
-<code>
-import { AppPage } from './app.po';
+<code>import { AppPage } from './app.po';
 import { browser, logging } from 'protractor';
 
 describe('workspace-project App', () => {
@@ -120,12 +119,11 @@ describe('workspace-project App', () => {
 </code></pre>
     <h3>app.po.ts</h3>
     <p>
-        In the AppPage's page object there is related code to using the App Page.
-        Navigate to the app page and get the page's title text.
+        In the AppPage's page object there is code that is only used on the app page.
+        Which in this example is navigate to the app page and get the page's title text.
     </p>
     <pre class="prettyprint lang-js linenums" data-start-visible="true">
-<code>
-import { browser, by, element } from 'protractor';
+<code>import { browser, by, element } from 'protractor';
 
 export class AppPage {
   navigateTo(): Promise&lt;unknown&gt; {
@@ -144,6 +142,9 @@ export class AppPage {
         As seen in the test above it has methods that navigates you to the page, or get an element and the text.
         It makes it simple to write more e2e tests because you can now easily reuse the functionality.
         For example if you write login and logout methods you can now use them in all the tests.
+    </p>
+    <p>
+        Page object file names typically end with <code>.po.ts</code>.
     </p>
     <p>
         Some links about page objects for further reading:
@@ -165,9 +166,8 @@ export class AppPage {
         <br>
         Or pass the duration to the <code>it()</code> method.
     </p>
-        <pre class="prettyprint lang-js">
-<code>
-it('a test', function() {
+    <pre class="prettyprint lang-js linenums">
+<code>it('a test', function() {
     // test code ...
 }, 10000); // 10 seconds
 </code></pre>
@@ -175,8 +175,7 @@ it('a test', function() {
         The protractor.conf.js file when generated with Angular 10 CLI:
     </p>
     <pre class="prettyprint lang-js linenums">
-<code>
-// @ts-check
+<code>// @ts-check
 // Protractor configuration file, see link for more information
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
@@ -240,8 +239,7 @@ exports.config = {
         By using the page object pattern we get very little code in the test itself and it's easy to follow each step.
     </p>
     <pre class="prettyprint lang-js linenums" data-start-visible="true">
-<code>
-it('should login, create item, edit item, delete item and then log out.', () => {
+<code>it('should login, create item, edit item, delete item and then log out.', () => {
     loginPage.login('saaratrix', '123456');
     appPage.createItem('item Nuu');
     // Used for asserts
@@ -258,17 +256,17 @@ it('should login, create item, edit item, delete item and then log out.', () => 
 
     <h1>Page object selectors</h1>
     <p>
-        When creating the e2e tests you need to know how to either use CSS Selectors or XPath to get the elements.
-        And sometimes you might need to update the HTML code to easier select a button, an input field etc.
+        When creating the e2e tests you need to know either how to use CSS Selectors or XPath to get the elements but CSS Selectors are recommended because of their readability.
+        And sometimes you might need to update the HTML to easier select a button, an input field etc.
 
-        But you can test the CSS selector in the browser's developer tools by simply writing <code>document.querySelector('selector query')</code>.
+        But you can test the CSS selector in the browser's developer tools by in the console writing <code>document.querySelector('selector query')</code>.
         And for XPath you can use <code>$x('xpath query')</code> in both Chrome and Firefox.
     </p>
     <h1>Tips & Tricks</h1>
     <ul>
         <li>
             Protractor is not executed synchronously.
-            The test code may look synchronous but everytime you do a <code>browser.</code> call you're adding a promise to some internal resolver.
+            The test code may look synchronous but everytime you do a <code>browser.</code> call you're adding a promise to some internal chain.
             So for example if you want to calculate the time it takes between browser.wait() calls in a test you can use <code>.then()</code> on each promise.
         </li>
         <li>
@@ -276,7 +274,7 @@ it('should login, create item, edit item, delete item and then log out.', () => 
         </li>
         <li>
             If you want to get the parent of an element you can do that with XPath (<code>by.xpath('..')</code>).
-            <code>element(by.css('.foo')).element(by.xpath('..'));</code>.
+            <code>element(by.css('.child')).element(by.xpath('..'));</code>.
             I have tried to find a better way but this is the simplest way that I know of so far.
         </li>
     </ul>
