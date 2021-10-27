@@ -1,0 +1,317 @@
+<!doctype html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+<p>
+  In this blog post I'll discuss making Nuusie's <a href="https://www.finalfantasyxiv.com/">Final Fantasy XIV</a> Chat Extractor for the <a href="https://advancedcombattracker.com/download.php">ACT Plugin.</a>.
+  And some of the obstacles encountered along the way.
+  Some of the obstacles were custom colours, manipulating text to look like an emote, *Luna is writing a blog post*, quotation marks.
+  <br>
+  The chat extractor can be found here: <a href="https://github.com/saaratrix/nuu-ffxiv-act-chat-extractor">https://github.com/saaratrix/nuu-ffxiv-act-chat-extractor</a>
+</p>
+<div id="toc" class="hide"></div>
+<div id="contents">
+  <h1>Introduction</h1>
+  <p>
+    The idea came from a friend who wanted to extract their stored chat logs and the tools she found was not as trustworthy to her as something made by me.
+    For example this tool was hosted through a web server and she didn't want to upload her chat logs there.
+    <a href="https://github.com/ErstonGreatman/ffxiv-act-chat-extractor">https://github.com/ErstonGreatman/ffxiv-act-chat-extractor</a>.
+  </p>
+  <p>
+    Which lead to the first obstacle that I wanted to design the tool so you can run it locally and I wanted it to be lightweight.
+    So that if someone does look through the code they can hopefully easily see that it just does what's expected.
+    You could add the script and css bundles inside the html page so that it's still 1 single page but the file wouldn't look as readable.
+    Even something smaller like Svelte still has 23 kb of minified javascript.
+  </p>
+  <p>
+    Developing everything in 1 file meant that I started using comments to try and separate things into sections.
+    For example like this:
+<pre>
+<code>
+// ******************
+// A section!
+// ******************
+</code>
+</pre>
+  </p>
+  <!--more-->
+  <h1>About the log files</h1>
+  <p>
+    The log files has a lot of text in them as the ACT Plugin is meant to store all the log data including combat data.
+    A chat entry is stored in the log like this:
+    <br>
+    <code>00|Timestamp|Code|Sender|Message|Hash</code>
+    <br>
+    The Code variable says what kind of message it is.
+    For example <strong>'000a'</strong> for Say and <strong>'000e'</strong> is Party.
+  </p>
+  <p>
+    A chat entry example:
+    <br>
+    <code>00|2021-09-04T20:49:41.0000000+03:00|001d|Lady Nuusie|Lady Nuusie gives Miss Bearington a big hug.|9cc26f43098036703a483d3a897dcff2</code>
+  </p>
+  <p>
+    Credit goes to <a href="https://github.com/isalin">Isalin</a> and their work to create the regex for parsing the chat log which sped up my development.
+    <a href="https://github.com/isalin/ACT-Log-Extractor">https://github.com/isalin/ACT-Log-Extractor</a>
+  </p>
+  <h1>Manipulating the data</h1>
+  <p>
+    After parsing all the data I had to handle it since we need to present it in a readable way for the user with colours etc.
+    The first version just listed each line with a timestamp - sender - message.
+  </p>
+  <p>
+    Then the second version added colours based on the <strong>Code</strong> variable and other formatting improvements.
+  </p>
+  <p>
+    But now came another obstacle, post processing the data to transform it based on rules.
+    My friend wanted the text to look different based on certain rules to fit different styles of roleplaying.
+  </p>
+  <h2>Text Transformation</h2>
+  <p>
+    I had to come up with a way to transform the text based on rules and I came up with a system that works like this:
+    <ol>
+      <li>When creating the lines we get all the active transform rules.</li>
+      <li>For each line we will iterate over all active transformers.</li>
+      <li>We check if the transformer supports that line code so for example something that only works on emotes doesn't try and transform tells.</li>
+      <li>We then use regex or a custom matcher to find any text the transformer can change.</li>
+      <li>If matches are found we then transform those matches. Which often was to add a &lt;span&gt; wrapping with a class to override the previous colour.</li>
+    </ol>
+  </p>
+  <p>
+    The current rules when writing this blog post are:
+<pre class="prettyprint lang-js">
+<code>
+const transformTextRules = [
+  { codes: ['001c', '001d'], name: 'Always show emote colour', regex: /.*/gm, active: true, method: transformTextToEmoteText },
+  { codes: ['001c', '001d'], name: 'Quotes in emotes as say', customMatcher: getQuotationMatches, active: true, method: transformQuotesToSayOrCustomSender },
+  { codes: ['*'], name: 'Asterisks as emote', regex: /\*[^\*]+\*/gm, active: true, method: transformAsterisksAsEmote },
+  { codes: ['*'], name: '( Out of character )', customMatcher: getOutOfCharacterMatches, regex: /\([^\)]+\)/, active: true, method: transformOutOfCharacter },
+];
+</code>
+</pre>
+  </p>
+  <p>
+    What I liked about this system is that they can be run independently on the same text.
+    Because even if you write *(( Hello ))* it will apply both transformers.
+    First using the asterisks one changing the text into this:
+    <br>
+    <code>&lt;span class="emote"&gt;*(( Hello ))*&lt;/span&gt;</code>.
+    <br>
+    And then apply the out of character transformer changing the message into:
+    <br>
+    <code>&lt;span class="emote"&gt;*&lt;span class="out-of-character"&gt;(( Hello ))&lt;/span&gt;*&lt;/span&gt;</code>
+  </p>
+  <h3>Quotation Transformation</h3>
+  <p>
+    But then my friend said that quoted text inside emotes should be treated as Say.
+    FFXIV is used by many people and cultures so I wanted to right away try and write a system that supports multiple kinds of quotation marks which was quite amusing to go to wikipedia and look up the combinations.
+    The different kinds of quotation marks can be found here: <a href="https://en.wikipedia.org/wiki/Quotation_mark#Unicode_code_point_table">https://en.wikipedia.org/wiki/Quotation_mark#Unicode_code_point_table</a>.
+  </p>
+  <p>
+    In my first approach I tried to just greedily use a regex that checks there is a quotation mark, some text then another quotation mark however that is a very naive approach that did not work at all.
+    For example this problem came up quickly:
+    <br>
+    <strong>"That's great!"</strong>.
+    <br>
+    Where it would only find the text <strong>"That'</strong>.
+  </p>
+  <p>
+    So after scratching my head I changed approach to mapping each different quotation mark with a potential combination of closing marks.
+    Which gave me this list of rules:
+<pre class="prettyprint lang-js" data-start-visible="true">
+<code>
+const quotationRules = [
+  { opening: '`', closing: ['`'] },
+  { opening: '#039;', closing: ['#039;'] },
+  { opening: '&quot;', closing: ['&quot;'] },
+  { opening: '‚', closing: ['‘', '’'] },
+  { opening: '„', closing: ['“'] },
+  { opening: '‘', closing: ['’'] },
+  { opening: '“', closing: ['”'] },
+  { opening: '’', closing: ['’'] },
+  { opening: '‹', closing: ['›'] },
+  { opening: '〈', closing: ['〉'] },
+  { opening: '«', closing: ['»'] },
+  { opening: '《', closing: ['》'] },
+  { opening: '›', closing: ['‹'] },
+  { opening: '»', closing: ['«', '»'] },
+  { opening: '「', closing: ['」'] },
+  { opening: '『', closing: ['』'] },
+];
+</code>
+</pre>
+  </p>
+  <p>
+    And then use <code>text.indexOf()</code> to get any opening occurrences and any closing occurrences.
+  </p>
+  <h1>Changing colour in the settings</h1>
+  <p>
+    The chat extractor has settings and you can change the colour of any message type which lead me into the world of dynamically update stylesheets.
+    However at first I thought if I should use inline style for custom colours but that wouldn't be a good approach.
+    Biggest reason was that it would mean that the output would have to be regenerated when a colour is updated.
+    Which would use a lot of extra CPU and lag.
+    So I decided to try and dynamically update the stylesheets.
+  </p>
+  <p>
+    I had never dynamically updated stylesheets before and I had to learn how that works but it was quite straightforward after looking at the <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet">CSSStyleSheet MDN Web Docs.</a>
+    To dynamically change the stylesheets I used this code and call it whenever a colour is updated.
+  <pre class="prettyprint lang-css" data-start-visible="true">
+<code>
+// get the stylesheet, styleSheets[0] is style.css
+// styleSheets[1] is the second style tag.
+const style = document.styleSheets[1];
+
+// Clear all the old rules, before doing this I ended up with hundreds of the same rules with slightly different colours :)
+while (style.cssRules.length) {
+  style.removeRule(0);
+}
+// Use an incrementing index because the rules are bound by indices.
+let index = 0;
+
+// Then just first add the message types (say, emote, party etc)
+for (const messageType of messageTypesAsArray) {
+  const css = `.${messageType.class} { color: ${messageType.color}; }`;
+  style.insertRule(css, index++);
+}
+
+// Then add custom senders if the user want's a custom sender colour instead of message type colour.
+for (const sender of customSenderColours) {
+  const css = `.${sender.class} { color: ${sender.customColor} }`;
+  style.insertRule(css, index++);
+}
+</code>
+</pre>
+  <h1>Deleting lines</h1>
+  <p>
+    There was another feature request to delete whole lines.
+    Which turned out to also be simpler than I thought.
+    A bit simplified but if we use the result from <strong>document.getSelection()</strong> and the <strong>focusNode</strong> and <strong>anchorNode</strong>.
+    We can then get the lines and then just iterate from start to end line and delete those lines.
+    Here's the code to remove selected lines.
+<pre class="prettyprint lang-js linenums">
+<code>
+/**
+ *
+ * @param {KeyboardEvent} event
+ */
+function tryRemoveSelectedText(event) {
+  if (event.key !== 'Delete' &amp;&amp; event.key !== 'Backspace') {
+    return;
+  }
+
+  const selection = document.getSelection();
+  if (!selection.rangeCount) {
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  const outputElement = document.getElementById('output');
+  const errorElement = document.getElementById('error');
+  if (range.commonAncestorContainer !== outputElement &amp;&amp; !outputElement.contains(range.commonAncestorContainer)) {
+    errorElement.innerText = `Can't remove selected text because it's not only the output.`;
+    return;
+  }
+
+  errorElement.innerText = '';
+  const focusLine = getLineElementFromSelectionNode(selection.focusNode);
+  const anchorLine = getLineElementFromSelectionNode(selection.anchorNode);
+
+  if (!focusLine || !anchorLine) {
+    return;
+  }
+
+  let focusLineNumber = parseInt(focusLine.dataset['id'], 10);
+  let anchorLineNumber = parseInt(anchorLine.dataset['id'], 10);
+
+  if (isNaN(focusLineNumber) || isNaN(anchorLineNumber)) {
+    return;
+  }
+
+  // focus or anchor node can be from either direction depending if you drag left or right with the selection.
+  const from = focusLineNumber &lt;= anchorLineNumber ? focusLine : anchorLine;
+  const to = focusLineNumber &gt;= anchorLineNumber ? focusLine : anchorLine;
+  let removeLines = false;
+
+  // There can be hidden lines so we need to get them index by index.
+  for (let i = outputElement.children.length - 1; i &gt;= 0; i--) {
+    const child = outputElement.children[i];
+    if (!child.classList.contains('line')) {
+      continue;
+    }
+
+    if (child === to) {
+      removeLines = true;
+    }
+
+    if (removeLines) {
+      const id = child.dataset['id'];
+      const index = currentParsedLines.findIndex(l =&gt; l.id === id);
+      currentParsedLines.splice(index, 1);
+      outputElement.removeChild(child);
+    }
+
+    if (child === from) {
+      break;
+    }
+  }
+
+  generateOutput(currentParsedLines);
+}
+
+function getLineElementFromSelectionNode(node) {
+  while (node.parentNode) {
+    if (node.classList?.contains('line')) {
+      return node;
+    }
+
+    node = node.parentNode;
+  }
+
+  return undefined;
+}
+</code>
+</pre>
+  </p>
+  <h1>Saving the output</h1>
+  <p>
+    The last part was to allow users to save the output which thanks just copying the CSS &amp; HTML the output became WYSIWYG.
+    To save an HTML file I added a blob download URL to an anchor tag.
+<pre class="prettyprint lang-js" data-start-visible="true">
+<code>
+function generateSaveAsHTML() {
+  const outputElement = document.getElementById('output');
+  const saveAsHTMLAnchor = document.querySelector('.save-as-html');
+  const output = getHTMLOutput(logFilename, outputElement.innerHTML);
+  const blob = new Blob([output]);
+  const url = window.URL.createObjectURL(blob);
+  saveAsHTMLAnchor.href = url;
+  saveAsHTMLAnchor.download = logFilename + '.html';
+  // For cleaning up blobs to not leak memory
+  existingObjectURLs.push(url);
+}
+</code>
+</pre>
+  </p>
+  <p>
+    However originally I was doing it every time the output was generated which was not good because it slowed down the output generation.
+    So I changed it to only generate the blob when the anchor tag is hovered or clicked.
+  </p>
+  <h1>Afterwords</h1>
+  <p>
+    My friend has been happy with it so far so that's nice to hear.
+    The conversation went something like this:
+  </p>
+  <p>
+    "Hey I want a chat extractor!"
+    <br>
+    - "I can look into it, ooh it looks quite simple in the end"
+    <br>
+    "Then add these features!"
+    <br>
+    <img src="https://i.redd.it/bn3bd5i51qv71.jpg">
+  </p>
+</div>
+</body>
+</html>
