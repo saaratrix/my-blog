@@ -9,7 +9,7 @@
 		Source code: <a href="https://github.com/saaratrix/asp.net-core-mvc-localized-routing">github.com/saaratrix/asp.net-core-mvc-localized-routing</a>
 	<br />
 	<h3>
-		<b>NOTE: </b>A reader notified me of some breaking changes in newer ASP.NET Core versions so there is an updated blog post here for version: <a href="/2017/12/localized-routing-aspnet-core-mvc-2.html">ASP.NET Core 2.1 MVC</a>
+		<b>NOTE: </b>A reader notified me of some breaking changes in newer ASP.NET Core versions so there is an updated blog post here for version: <a href="/posts/2017/12/localized-routing-aspnet-core-mvc-2.html">ASP.NET Core 2.1 MVC</a>
 	</h3>
 	<br />
 	<div id="toc" class="hide"></div>
@@ -138,10 +138,10 @@
 					"sv"
 				};
 				services.AddMvc(o =>
-				{                
-					o.Conventions.Insert(0, new LocalizedRouteConvention());                           
+				{
+					o.Conventions.Insert(0, new LocalizedRouteConvention());
 				});
-				services.AddLocalization();      
+				services.AddLocalization();
 			}
 		</code>
 		</pre>
@@ -156,17 +156,17 @@
 		{
 			RequestCulture defaultCulture = new RequestCulture( LocalizationDataHandler.DefaultCulture );
 			RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions();
-				
+
 			localizationOptions.SupportedCultures = new System.Collections.Generic.List&lt;cultureinfo&gt;();
 			foreach (string culture in LocalizationDataHandler.SupportedCultures)
 			{
 				 localizationOptions.SupportedCultures.Add(new CultureInfo(culture));
-			}            
+			}
 			localizationOptions.RequestCultureProviders = new System.Collections.Generic.List&lt;IRequestCultureProvider&gt;()
 			{
 				 new UrlCultureProvider(  localizationOptions.SupportedCultures )
-			};  
-						   
+			};
+
 			app.UseRequestLocalization(localizationOptions, defaultCulture);
 		}
 		</code>
@@ -185,7 +185,7 @@
 			/// Determines the culture information for a request via the value of the start of a url.
 			/// &lt;/summary&gt;
 			public class UrlCultureProvider : RequestCultureProvider
-			{       
+			{
 				/// &lt;summary&gt;
 				/// The default culture if none is found
 				/// &lt;/summary&gt;
@@ -197,7 +197,7 @@
 				public UrlCultureProvider(IList&lt;CultureInfo&gt; a_supportedCultures)
 				{
 					SupportedCultures = a_supportedCultures;
-				}              
+				}
 				public override Task&lt;ProviderCultureResult&gt; DetermineProviderCultureResult(HttpContext httpContext)
 				{
 					if (httpContext == null)
@@ -208,7 +208,7 @@
 					int pathLength = url.Length;
 					// example: /fi
 					if (pathLength &gt;= 3)
-					{   
+					{
 						if (url.Length &gt;= 4)
 						{
 							// If the 4th character isn't a /   for example
@@ -226,7 +226,7 @@
 							{
 								return Task.FromResult(new ProviderCultureResult(culture.Name));
 							}
-						}                
+						}
 					}
 					return Task.FromResult(new ProviderCultureResult(DefaultCulture));
 				}
@@ -244,16 +244,16 @@
 		<br />
 		<pre class="prettyprint linenums">
 		<code>
-			[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple =true)]   
+			[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple =true)]
 			public class LocalizedRouteAttribute : Attribute
 			{
 				/// &lt;summary&gt;
-				/// The character to replace whitespace with in the input route, like 
+				/// The character to replace whitespace with in the input route, like
 				/// "batman rocks" =&gt; "batman_rocks" as route
 				/// &lt;/summary&gt;
 				private const char WhiteSpaceReplacement = '_';
 				public LocalizedRouteAttribute()
-				{                        
+				{
 				}
 				/// &lt;summary&gt;
 				/// Attribute used by LocalizationConvention to create all the routes.
@@ -267,13 +267,13 @@
 					Route = a_route;
 					// Replace all the spaces with the whitespace replacement character
 					Route = Route.Replace(' ', WhiteSpaceReplacement);
-				
+
 					// If the link is null then set it to the route
 					if (a_link == null)
 					{
 		#if DNX451
 						CultureInfo cultureInfo = new CultureInfo(Culture, false);
-						TextInfo textInfo = cultureInfo.TextInfo;                
+						TextInfo textInfo = cultureInfo.TextInfo;
 						// Do the opposite that route does,  replace the whitespace replacement characters with whitespace!
 						Link = textInfo.ToTitleCase(Route.Replace( WhiteSpaceReplacement, ' '));
 		#else
@@ -288,16 +288,16 @@
 					}
 					else
 					{
-						Link = a_link;                
+						Link = a_link;
 					}
-						 
+
 				}
 				/// &lt;summary&gt;
 				/// The culture string representation, en, en-Us e.t.c.!
 				/// &lt;/summary&gt;
 				public string Culture { get; set; }
 				/// &lt;summary&gt;
-				/// The route, no need for / 
+				/// The route, no need for /
 				/// &lt;/summary&gt;
 				public string Route { get; set; }
 				/// &lt;summary&gt;
@@ -315,15 +315,15 @@
 		The code for the localization controller:
 		<br />
 		<pre class="prettyprint linenums">
-		<code>        
+		<code>
 		public class LocalizationController : Controller
 		{
 		   public override void OnActionExecuting(ActionExecutingContext context)
-		   {            
+		   {
 				base.OnActionExecuting(context);
 				string culture = CultureInfo.CurrentCulture.Name;
-				ViewData["culture"] = culture;       
-				// Could do database stuff or resource file loading here       
+				ViewData["culture"] = culture;
+				// Could do database stuff or resource file loading here
 		   }
 		}
 			</code>
@@ -338,12 +338,12 @@
 		<br />
 		<pre class="prettyprint">
 		<code>
-			&lt;a asp-action="index" asp-controller="home" asp-culture="fi"&gt;&lt;/a&gt;   
+			&lt;a asp-action="index" asp-controller="home" asp-culture="fi"&gt;&lt;/a&gt;
 		</code>
 		</pre>
 		The snippet above will output the finnish url + link text for the home controller index action. The whole code for the taghelper:
 		<br />
-		<pre class="prettyprint linenums"> 
+		<pre class="prettyprint linenums">
 		<code>
 			[HtmlTargetElement("a", Attributes = CultureAttributeName)]
 			public class CultureActionLinkTagHelper : TagHelper
@@ -351,11 +351,11 @@
 				private const string CultureAttributeName = "asp-culture";
 				/// &lt;summary&gt;
 				/// The culture attribute
-				/// &lt;/summary&gt;        
+				/// &lt;/summary&gt;
 				[HtmlAttributeName(CultureAttributeName)]
-				public string Culture { get; set; }        
+				public string Culture { get; set; }
 				public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-				{   
+				{
 					if (string.IsNullOrEmpty( Culture ))
 					{
 						Culture = LocalizationDataHandler.DefaultCulture;
@@ -365,12 +365,12 @@
 					string actionName = context.AllAttributes["asp-action"].Value as string;
 					LocalizedUrlResult result = LocalizationDataHandler.GetUrl(controllerName, actionName, Culture);
 					output.Attributes["href"] = result.Url;
-					output.Content.SetContent(result.UrlName);                
-				
+					output.Content.SetContent(result.UrlName);
+
 					return Task.FromResult(0);
 				}
 			}
-		</code>   
+		</code>
 		</pre>
 		<h2>LocalizedRouteConvention.cs</h2>
 		This is the heart in setting up all the routing.
@@ -389,7 +389,7 @@
 					if (actionComponents[i][0] == '{')
 					{
 						parameterTemplate += "/" + actionComponents[i];
-					}                        
+					}
 				}
 		</code>
 		</pre>
@@ -410,7 +410,7 @@
 		<code>
 			public class LocalizedRouteConvention : IApplicationModelConvention
 			{
-				public string DefaultCulture { get; set; }        
+				public string DefaultCulture { get; set; }
 				public LocalizedRouteConvention()
 				{
 					DefaultCulture = LocalizationDataHandler.DefaultCulture;
@@ -419,22 +419,22 @@
 				public void Apply(ApplicationModel application)
 				{
 					foreach (ControllerModel controller in application.Controllers)
-					{    
+					{
 						// If the controllerName is the same as the base controller for localization go next since it's irrelevant!
 						if (controller.ControllerName == "Localization")
 						{
 							continue;
 						}
-						// Do the controller            
+						// Do the controller
 						AddControllerRoutes(controller);
 						// Do the actions!
-						AddActionRoutes(controller);                       
+						AddActionRoutes(controller);
 					}
 				}
 				/// &lt;summary&gt;
 				/// Adds the prefix local routs to each controller.
 				/// Example: Culture = fi, Route = "moi"
-				/// Create Route prefix: fi/moi   
+				/// Create Route prefix: fi/moi
 				/// &lt;/summary&gt;
 				/// &lt;param name="a_controller"&gt;&lt;/param&gt;
 				public void AddControllerRoutes(ControllerModel a_controller)
@@ -466,7 +466,7 @@
 					// Example if [LocalizedRoute("sv", ""] is not on the defaultcontroller it will be added so its found!
 					Dictionary&lt;string, string&gt; foundCultures = LocalizationDataHandler.SupportedCultures.ToDictionary(x =&gt; x, x =&gt; x);
 					foundCultures.Remove(LocalizationDataHandler.DefaultCulture);
-				
+
 					// Loop over all localized attributes
 					foreach (LocalizedRouteAttribute attribute in controllerLocalizations)
 					{
@@ -480,7 +480,7 @@
 						// So eg:  /fi/koti   doesn't happen twice
 						foundCultures.Remove(attribute.Culture);
 					}
-				
+
 					// Add a route for the controllers that didn't have localization route attributes with their default name
 					foreach (KeyValuePair&lt;string, string&gt; culture in foundCultures)
 					{
@@ -488,7 +488,7 @@
 						if (controllerName == LocalizationDataHandler.DefaultController)
 						{
 							tempName = "";
-					   
+
 						}
 						string template = culture.Value + "/" + tempName;
 						AttributeRouteModel localRoute = new AttributeRouteModel();
@@ -496,8 +496,8 @@
 						a_controller.AttributeRoutes.Add(localRoute);
 						LocalizationDataHandler.AddControllerData(controllerName, culture.Value, template);
 					}
-				}  
-			
+				}
+
 				/// &lt;summary&gt;
 				/// Adds the localized routes for a controller
 				/// &lt;/summary&gt;
@@ -513,12 +513,12 @@
 					{
 						string actionName = action.ActionName;
 						// If any parameters are needed such as /{index}
-						string parameterTemplate = "";                
+						string parameterTemplate = "";
 						// If there is no [Route()] Attribute then create one for the route.
 						if (action.AttributeRouteModel == null)
-						{                    
+						{
 							action.AttributeRouteModel = new AttributeRouteModel();
-						  
+
 							if (action.ActionName != LocalizationDataHandler.DefaultAction)
 							{
 								action.AttributeRouteModel.Template = actionName;
@@ -530,12 +530,12 @@
 								action.AttributeRouteModel.Template = "";
 								// If action name is the default name then just add route as ""
 								// Final result for default controller & action will be "" + ""  =&gt; /
-								LocalizationDataHandler.AddActionData(controllerName, actionName, DefaultCulture, "", controllerName);                        
+								LocalizationDataHandler.AddActionData(controllerName, actionName, DefaultCulture, "", controllerName);
 							}
 						}
 						// If a route already existed then check for parameter arguments to add to the cultural routes
 						else
-						{                    
+						{
 							// Check if the route has parameters
 							string[] actionComponents = action.AttributeRouteModel.Template.Split('/');
 							for (int i = 0; i &lt; actionComponents.Length; i++)
@@ -544,14 +544,14 @@
 								if (actionComponents[i][0] == '{')
 								{
 									parameterTemplate += "/" + actionComponents[i];
-								}                        
-							}                  
+								}
+							}
 						}
 						var actionLocalizationsAttributes = action.Attributes.OfType&lt;LocalizedRouteAttribute&gt;().ToList();
 						foreach (LocalizedRouteAttribute attribute in actionLocalizationsAttributes)
 						{
 							string route = attribute.Route += parameterTemplate;
-							ActionModel newLocalizedActions = new ActionModel(action);                    
+							ActionModel newLocalizedActions = new ActionModel(action);
 							newLocalizedActions.AttributeRouteModel = new AttributeRouteModel();
 							newLocalizedActions.AttributeRouteModel.Template = attribute.Route;
 							newActions.Add(newLocalizedActions);
@@ -565,7 +565,7 @@
 					{
 						a_controller.Actions.Add(action);
 					}
-				}      
+				}
 			}
 		</code>
 		</pre>
@@ -586,7 +586,7 @@
 				/// The inner html for the anchor tag.
 				/// &lt;/summary&gt;
 				public string LinkName;
-			
+
 			}
 		</code>
 		</pre>
@@ -637,12 +637,12 @@
 				public static void AddControllerData(string a_controller, string a_culture, string a_route)
 				{
 					string controllerKey = a_controller.ToLower();
-				
-					// If the controller doesn't exist, create it!            
+
+					// If the controller doesn't exist, create it!
 					if (!ControllerRoutes.ContainsKey(controllerKey))
-					{                
+					{
 						ControllerRoutes.TryAdd(controllerKey, new CultureControllerData());
-					}            
+					}
 					ControllerRoutes[controllerKey].Names.TryAdd(a_culture, a_route);
 				}
 				/// &lt;summary&gt;
@@ -654,16 +654,16 @@
 				/// &lt;param name="a_route"&gt;&lt;/param&gt;
 				/// &lt;param name="a_linkName"&gt;&lt;/param&gt;
 				public static void AddActionData(string a_controller, string a_action, string a_culture, string a_route, string a_linkName)
-				{            
-					string actionKey = a_action.ToLower();           
+				{
+					string actionKey = a_action.ToLower();
 					CultureControllerData controllerData = ControllerRoutes[a_controller.ToLower()];
 					if (!controllerData.Actions.ContainsKey(actionKey))
 					{
 						controllerData.Actions.TryAdd(actionKey, new CultureActionData());
 					}
 					controllerData.Actions[actionKey].UrlData.TryAdd(a_culture, new CultureUrlData(a_route, a_linkName));
-				}        
-			
+				}
+
 				/// &lt;summary&gt;
 				/// Get the url for a controller & action based on culture
 				/// &lt;/summary&gt;
@@ -683,7 +683,7 @@
 						{
 							// Ok now we have the controller name and action data name!
 							CultureActionData actionData = controllerData.Actions[a_actionKey];
-						
+
 							// Check if culture is default culture
 							if (a_culture == DefaultCulture)
 							{
@@ -704,12 +704,12 @@
 									a_action = "";
 								}
 								result.Url = "/" + a_controller + a_action;
-								result.LinkName = a_action;                        
+								result.LinkName = a_action;
 							}
 							// If the culture isn't default culture
 							else
 							{
-							
+
 								CultureUrlData linkData = actionData.UrlData.ContainsKey(a_culture) ? actionData.UrlData[a_culture] : actionData.UrlData[DefaultCulture];
 								// If the controller doesn't exist add the culture prefix to it stays in the culture prefix space.
 								string controllerName = controllerData.Names.ContainsKey(a_culture) ? controllerData.Names[a_culture] : a_culture + "/" + a_controller;
@@ -718,17 +718,17 @@
 								// If not it would be for example /fi/accountLogin    instead of /fi/account/login
 								if (!a_controller.Equals(DefaultController, StringComparison.CurrentCultureIgnoreCase))
 								{
-									// So it becomes =&gt; /culture/controller/ 
+									// So it becomes =&gt; /culture/controller/
 									controllerName += "/";
 								}
 								result.Url = "/" + controllerName + actionName;
 								result.LinkName = linkData.Link;
-							}                    
+							}
 						}
 						// Return just the controller?
 						else
 						{
-						
+
 						}
 					}
 					return result;
@@ -774,7 +774,7 @@
 		<pre class="prettyprint linenums">
 		<code>
 			public class CultureActionData
-			{        
+			{
 				public ConcurrentDictionary&lt;string, CultureUrlData&gt; UrlData { get; }
 				public CultureActionData()
 				{
@@ -810,12 +810,12 @@
 		The homecontroller code I added some localization routes for.
 		<pre class="prettyprint linenums">
 		<code>
-			// This is not neccesary if Home is the defaultcontroller, automatically happens!    
-			[LocalizedRoute("fi", "")]    
+			// This is not neccesary if Home is the defaultcontroller, automatically happens!
+			[LocalizedRoute("fi", "")]
 			[LocalizedRoute("sv", "")]
 			public class HomeController : LocalizationController
-			{   
-			
+			{
+
 				public IActionResult Index()
 				{
 					return View();
@@ -836,7 +836,7 @@
 					ViewData["Message"] = "Your contact page.";
 					return View();
 				}
-			
+
 				public IActionResult Error()
 				{
 					return View();
@@ -852,15 +852,15 @@
 			// No need to name the route local, That's the name it automatically gets
 			//[LocalizedRoute("sv", "local")]
 			public class LocalController : LocalizationController
-			{        
+			{
 				public LocalController()
 				{
-				 
-				}      
-			
+
+				}
+
 				// Ignore index since it's default action
 				public IActionResult Index()
-				{           
+				{
 					return View();
 				}
 				// Add the route for default culture with parameters
