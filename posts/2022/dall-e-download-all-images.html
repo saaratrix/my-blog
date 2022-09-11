@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+  <p>
+    There is currently no way (September 2022) to download all images for DALL-E at <a href="https://labs.openai.com/">https://labs.openai.com/</a>.
+    Which made me write a quick and dirty script to download all images for the current prompt or for all of the prompts.
+    If you need such functionality then you can copy-paste the code and paste it into the browser's developer tools (F12 as default).
+    After pasting the code it should add two buttons in the header that you can click.
+    <br>
+    <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhUsVDldnlM4t9iSZhfwHb_D7qBGwBQHsivwErXW3881gpZeIN5y4AwfNd9fDCOp-y8Xl2GWps4m-GLCpOV5WtkYuNbClq708khBq9-mI8_SoBY0GDxYMwXkkZQSnNt-89bsNmy3RrpdqKZrNO2z2qvpx-L8E1qMZh3XbbUyXy8RZcCO0Wo1vg5OJ7s/s1600/dall-e-luna-writes-blog-post.png"><img alt="download buttons in header" style="max-width: 100%;" border="0" data-original-height="109" data-original-width="1044" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhUsVDldnlM4t9iSZhfwHb_D7qBGwBQHsivwErXW3881gpZeIN5y4AwfNd9fDCOp-y8Xl2GWps4m-GLCpOV5WtkYuNbClq708khBq9-mI8_SoBY0GDxYMwXkkZQSnNt-89bsNmy3RrpdqKZrNO2z2qvpx-L8E1qMZh3XbbUyXy8RZcCO0Wo1vg5OJ7s/s1600/dall-e-luna-writes-blog-post.png"/></a>
+  </p>
+  <p>
+    Some notes:
+  </p>
+  <ul>
+    <li>
+      It helps a lot to disable <code>"Ask where to save each file before downloading"</code> as otherwise you'll be spammed with prompts to download the files.
+      And to change the download folder as it's 200 images for all the items.
+      <br>
+      In chrome:  <code>Settings -> Downloads -> Uncheck the toggle button.</code>
+    </li>
+    <li>
+      Since the items in the list to the right are lazy loaded it's good to scroll all the way to the bottom if downloading all the images.
+    </li>
+    <li>
+      Because this script uses timings it might fail to find the download buttons, and it'll then log the item in the list to the right, so you can mouseover the item, and it should highlight the element.
+      You can then click the current prompt button for those items.
+    </li>
+    <li>
+      This searches for the text "Download" to find the download button.
+      If DALL-E has localization you will have to change the <code>DOWNLOAD</code> for this line of code to what it is for you.
+      <br>
+      <code>if (item.textContent.toUpperCase().includes('DOWNLOAD')) {</code>
+    </li>
+  </ul>
+  <p>
+    The code to copy paste into developer tools:
+  </p>
+<pre class="prettyprint lang-js linenums" data-start-visible="true">
+<code>
+/**
+ * Get the items in the right panel and download for each item.
+ */
+async function downloadAllImages() {
+  var items = document.querySelectorAll('.hist-task-link');
+  for (let i = 0; i < items.length; i++) {
+    const item = items.item(i);
+    item.click();
+    await awaitTimeout(2000);
+    await downloadImagesForCurrent(item);
+    await awaitTimeout(10);
+  }
+}
+
+/**
+ * Download all the items for an item in the right side panel.
+ * Since the items are lazy loaded it helps to scroll all the way to the bottom first so all the items are loaded.
+ */
+function downloadImagesForCurrent(listItem) {
+  const promise = new Promise(async (res) => {
+    const extraButtons = document.querySelectorAll('.task-page-quick-actions-button');
+    for (let i = 0; i < extraButtons.length; i++) {
+      await downloadImage(extraButtons.item(i), listItem);
+      await awaitTimeout(100);
+    }
+
+    res();
+  });
+
+  return promise;
+}
+
+/**
+ * Download an image by clicking the ... and then the download button that appears.
+ * It helps to disable "Ask where to save each file before downloading", eg in chrome:  Settings -> Downloads -> Uncheck that toggle button.
+ */
+async function downloadImage(extraButton, listItem) {
+  extraButton.click();
+  await awaitTimeout(50);
+  const downloadButton = getLastDownloadButton();
+  if (!downloadButton) {
+    console.log('Could not find download button for', listItem);
+    return;
+  }
+
+  downloadButton.click();
+}
+
+/**
+ * We need to get the last download button because there might be multiple open at once.
+ */
+function getLastDownloadButton() {
+  const selectableItems = document.querySelectorAll('.menu-item-selectable');
+  for (let i = selectableItems.length - 1; i >= 0; i--) {
+    const item = selectableItems.item(i);
+    if (item.textContent.toUpperCase().includes('DOWNLOAD')) {
+      return item;
+    }
+  }
+}
+
+/**
+ * Adds an awaitable setTimeout since we need to wait for buttons.
+ */
+function awaitTimeout(delay) {
+  return new Promise(res => setTimeout(() => res(), delay));
+}
+
+!function() {
+  const header = document.querySelector('.app-header-contents');
+  if (!header) {
+    console.log('Could not find header element to add buttons, you need to use code manually.')
+    console.log('downloadAllImages() - to download all images');
+    console.log('downloadImagesForCurrent() - to download current prompt');
+    return;
+  }
+
+  const downloadAllButton = document.createElement('button');
+  downloadAllButton.innerText = 'Download All';
+  downloadAllButton.onclick = downloadAllImages;
+
+  const downloadCurrent = document.createElement('button');
+  downloadCurrent.innerText = 'Download Current Prompt';
+  downloadCurrent.onclick = downloadImagesForCurrent;
+
+  header.appendChild(downloadAllButton);
+  header.appendChild(downloadCurrent);
+}();
+</code>
+</pre>
+</body>
+</html>
