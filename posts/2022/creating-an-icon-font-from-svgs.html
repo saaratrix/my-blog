@@ -6,14 +6,8 @@
 </head>
 <body>
 <p>
-  In this post we'll go over how to combine SVG files into an icon font file.
-  <br>
-  You can also use an SVG Sprite Sheet and use xlink: <code>&lt;svg&gt;&lt;use xlink:href="#icon-muumi" /&gt;&lt;/svg&gt;</code>.
-  <br>
-  There's also CSS property <code>background-image</code> but it doesn't offer as good UX.
-  To do hover effect we need to apply filters instead of just color.
-  <br>
-  More information on other approaches: <a href="https://css-tricks.com/change-color-of-svg-on-hover/">https://css-tricks.com/change-color-of-svg-on-hover/</a>.
+  In this post we'll go over how to combine or convert SVG files into an icon font file.
+  In short, we'll git clone a repository <code>svgtofont</code>, modify src/cli.js and then run a node script to generate the font.
 </p>
 <h1>svgtofont</h1>
 <p>
@@ -21,20 +15,20 @@
   It supports generating eot, ttf, woff, woff2 and svg files.
   Svgtofont uses other projects such as <a href="https://github.com/nfroidure/svgicons2svgfont">svgicons2svgfont</a> and <a href="https://github.com/fontello/svg2ttf#readme">svg2ttf</a>.
 </p>
+
+<h2>Cloning the repository</h2>
+<p>
+  Command to clone it and set it up locally in your terminal:
+  <code>git clone https://github.com/jaywcjlove/svgtofont.git</code>
+</p>
 <h2>Generating the icon files</h2>
 <p>
-  We create two folders in the cloned svgtofont repository: <strong>icons</strong> and <strong>output</strong>.
-  "icons" is the folder where all the svg files go and output is the output folder.
-  To run it we need to run a cli command which we can do by adding an npm script in package.json.
+  Add two folders in the newly cloned svgtofont folder: <strong>icons</strong> and <strong>output</strong>.
+  "icons" is the folder where you will put all the svg files.
 </p>
-<pre><code>"scripts": {
-  ...
-  "generate-output": "node lib/cli.js --sources ./icons --output ./output --fontName your-font-name"
-},
-</code></pre>
 <p>
-  We also need to modify the settings to tell the library to generate html files which we do by modifying the <code>src/cli.ts</code> file.
-  We need to add the website property to the input to <code>svgtofont</code>.
+  Modify existing <code>src/cli.ts</code> file by adding the website property roughly on line 46. <code>website: { ... }</code>, full example below:
+  Change <code>your-font-name</code> to what you want to call the font.
 </p>
 <pre class="prettyprint lang-js linenums">
 <code>
@@ -59,8 +53,8 @@ svgtofont({
 </code></pre>
 <h1>The output</h1>
 <p>
-  Now run the npm script <code>generate-output</code> and it should create the font files and the html files.
-  If it doesn't then check that the SVG files are valid.
+  Run the converter with a node script <code>node src/cli.js --sources ./icons --output ./output --fontName your-font-name</code> in your terminal.
+  If it doesn't create the files in output folder then check that the SVG files are valid.
   I had invalid SVG files and scratched my head wondering why the library did not work.
 </p>
 <p>
